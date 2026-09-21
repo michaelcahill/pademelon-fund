@@ -29,7 +29,6 @@ content:
     label: News
     type: collection
     path: src/content/news
-    format: md # or mdx
     fields:
       - name: title
         label: Article Title
