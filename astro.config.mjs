@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import { satteri } from '@astrojs/markdown-satteri';
 import tailwindcss from '@tailwindcss/vite';
 
 // Use GITHUB_PAGES env var to conditionally set the base path.
@@ -9,28 +10,27 @@ import tailwindcss from '@tailwindcss/vite';
 const isGithubPages = process.env.GITHUB_PAGES === 'true';
 const base = isGithubPages ? '/pademelon-fund' : '';
 
-// Rehype plugin to prefix image src paths with the base path in markdown content.
+// HAST plugin for the Sätteri Markdown processor to prefix image src paths
+// with the base path in markdown content.
 // Astro automatically prefixes CSS/JS assets and astro:assets images, but not
 // regular markdown <img> src attributes.
 function prefixImagePaths() {
-  return (tree) => {
-    function visit(node) {
-      if (
-        node.type === 'element' &&
-        node.tagName === 'img' &&
-        node.properties &&
-        typeof node.properties.src === 'string' &&
-        base &&
-        !node.properties.src.startsWith(base) &&
-        !node.properties.src.startsWith('http')
-      ) {
-        node.properties.src = base + node.properties.src;
-      }
-      if (node.children) {
-        node.children.forEach(visit);
-      }
-    }
-    visit(tree);
+  return {
+    name: 'prefix-image-paths',
+    element: {
+      filter: ['img'],
+      visit(node, ctx) {
+        const src = node.properties?.src;
+        if (
+          base &&
+          typeof src === 'string' &&
+          !src.startsWith(base) &&
+          !src.startsWith('http')
+        ) {
+          ctx.setProperty(node, 'src', base + src);
+        }
+      },
+    },
   };
 }
 
@@ -42,6 +42,8 @@ export default defineConfig({
     plugins: [tailwindcss()]
   },
   markdown: {
-    rehypePlugins: [prefixImagePaths]
-  }
+    processor: satteri({
+      hastPlugins: [prefixImagePaths()],
+    }),
+  },
 });
