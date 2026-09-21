@@ -1,18 +1,25 @@
 ---
+import { getCollection, render } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 
-const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const home = await getCollection('pages', ({ id }) => id === 'home').then(
+  (pages) => pages[0],
+);
+
+if (!home) {
+  throw new Error('Missing required content page: src/content/pages/home.md');
+}
+
+const { Content } = await render(home);
 ---
 
-<Layout title="Pademelon Fund" description="Supporting grassroots action for nature, First Nations and climate across Australia.">
+<Layout title={home.data.title} description={home.data.description}>
   <div class="max-w-3xl">
     <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight mb-6">
-      Pademelon Fund
+      {home.data.title}
     </h1>
-    <p class="text-lg text-slate-600 leading-relaxed mb-8">
-      We support grassroots action for nature, First Nations and climate across Australia.
-      Explore our <a href={base + "/news"} class="text-emerald-700 hover:text-emerald-800 font-medium transition">news</a> to learn about our work and impact,
-      or <a href={base + "/contact"} class="text-emerald-700 hover:text-emerald-800 font-medium transition">contact us</a>.
-    </p>
+    <div class="text-lg text-slate-600 leading-relaxed [&_a]:text-emerald-700 [&_a]:hover:text-emerald-800 [&_a]:font-medium [&_a]:transition">
+      <Content />
+    </div>
   </div>
 </Layout>

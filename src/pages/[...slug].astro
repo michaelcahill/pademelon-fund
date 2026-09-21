@@ -3,7 +3,8 @@ import { getCollection, render, type CollectionEntry } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 
 export async function getStaticPaths() {
-  const pages = await getCollection('pages');
+  // 'home' is rendered by src/pages/index.astro, not as a slug route.
+  const pages = await getCollection('pages', ({ id }) => id !== 'home');
   return pages.map((page) => ({
     params: { slug: page.id },
     props: { page },
