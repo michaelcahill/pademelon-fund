@@ -39,7 +39,7 @@ content:
         label: Publish Date
         type: date
         options:
-          format: YYYY-MM-DD
+          format: yyyy-mm-dd
         required: true
 
       - name: description
