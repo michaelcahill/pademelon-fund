@@ -1,22 +1,59 @@
+# Media uploads destination
 media:
   input: public/images
   output: /images
 
 content:
-  - name: posts
-    label: News
+  # Standalone pages (created manually as needed)
+  - name: pages
+    label: Pages
     type: collection
-    path: src/content/blog
+    path: src/content/pages
+    format: md # or mdx
     fields:
       - name: title
-        label: Title
+        label: Page Title
         type: string
+        required: true
+
+      - name: description
+        label: Meta Description
+        type: string
+        required: false
+
+      - name: body
+        label: Page Content
+        type: rich-text
+
+  # News posts (blog-like)
+  - name: news
+    label: News
+    type: collection
+    path: src/content/news
+    format: md # or mdx
+    fields:
+      - name: title
+        label: Article Title
+        type: string
+        required: true
+
       - name: pubDate
         label: Publish Date
         type: date
+        options:
+          format: YYYY-MM-DD
+        required: true
+
       - name: description
-        label: Description
+        label: Summary
         type: string
+        required: true
+
+      - name: image
+        label: Featured Image
+        type: image
+        required: false
+
       - name: body
         label: Content
         type: rich-text

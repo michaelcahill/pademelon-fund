@@ -1,0 +1,52 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('news');
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+interface Props {
+  post: CollectionEntry<'news'>;
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+---
+
+<Layout title={post.data.title} description={post.data.description}>
+  <article class="max-w-3xl mx-auto">
+    <header class="mb-8">
+      <time class="text-sm font-medium text-emerald-700">
+        {post.data.pubDate.toLocaleDateString('en-US', { dateStyle: 'long' })}
+      </time>
+      <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight mt-2 mb-4">
+        {post.data.title}
+      </h1>
+      <p class="text-lg text-slate-600 leading-relaxed">
+        {post.data.description}
+      </p>
+      {post.data.image && (
+        <img 
+          src={post.data.image} 
+          alt={post.data.title} 
+          class="w-full h-72 object-cover rounded-2xl mt-6 border border-slate-200 shadow-sm" 
+        />
+      )}
+    </header>
+
+    <div class="prose prose-slate prose-emerald max-w-none">
+      <Content />
+    </div>
+
+    <div class="mt-12 pt-6 border-t border-slate-200">
+      <a href="/news" class="text-sm font-semibold text-emerald-700 hover:text-emerald-800">
+        &larr; Back to all news
+      </a>
+    </div>
+  </article>
+</Layout>

@@ -1,0 +1,33 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+
+const newsPosts = (await getCollection('news')).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+---
+
+<Layout title="News & Updates" description="Latest articles and news updates.">
+  <div class="max-w-2xl">
+    <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight mb-8">
+      News & Updates
+    </h1>
+    <div class="space-y-8">
+      {newsPosts.map((post) => (
+        <article class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+          <time class="text-xs font-semibold uppercase tracking-wider text-emerald-700">
+            {post.data.pubDate.toLocaleDateString('en-US', { dateStyle: 'medium' })}
+          </time>
+          <h2 class="text-xl font-bold text-slate-900 mt-2 hover:text-emerald-700 transition">
+            <a href={`/news/${post.id}`}>
+              {post.data.title}
+            </a>
+          </h2>
+          <p class="text-slate-600 mt-2 text-sm leading-relaxed">
+            {post.data.description}
+          </p>
+        </article>
+      ))}
+    </div>
+  </div>
+</Layout>
