@@ -1,6 +1,6 @@
 # Pademelon Fund
 
-An Astro site supporting effective animal advocacy in Australia, editable via
+An Astro site supporting grassroots action for nature, First Nations and climate action across Australia, editable via
 [PagesCMS](https://pagescms.dev).
 
 ## Development

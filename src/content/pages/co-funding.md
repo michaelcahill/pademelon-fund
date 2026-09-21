@@ -1,6 +1,6 @@
 ---
 title: Co-funding
-description: Opportunities to co-fund high-impact animal advocacy projects.
+description: Opportunities to co-fund grassroots action for nature, First Nations and climate across Australia.
 ---
 
 ## What are current opportunities other individuals/orgs can join in on

@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const newsPosts = (await getCollection('news')).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 );
@@ -19,7 +20,7 @@ const newsPosts = (await getCollection('news')).sort(
             {post.data.pubDate.toLocaleDateString('en-US', { dateStyle: 'medium' })}
           </time>
           <h2 class="text-xl font-bold text-slate-900 mt-2 hover:text-emerald-700 transition">
-            <a href={`/news/${post.id}`}>
+            <a href={base + `/news/${post.id}`}>
               {post.data.title}
             </a>
           </h2>

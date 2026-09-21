@@ -1,1 +1,106 @@
 @import "tailwindcss";
+
+/* Base styles matching the testsite's clean, minimal aesthetic */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-white text-slate-800 antialiased;
+}
+
+/* Typography enhancements for content pages */
+.prose {
+  @apply text-slate-700;
+}
+
+.prose h1,
+.prose h2,
+.prose h3 {
+  @apply text-slate-900 font-extrabold tracking-tight;
+}
+
+.prose h1 {
+  @apply text-4xl mb-8;
+}
+
+.prose h2 {
+  @apply text-2xl mt-12 mb-4;
+}
+
+.prose h3 {
+  @apply text-xl mt-8 mb-2;
+}
+
+.prose p {
+  @apply leading-relaxed mb-4;
+}
+
+.prose a {
+  @apply text-emerald-700 hover:text-emerald-800 font-medium transition;
+}
+
+.prose blockquote {
+  @apply border-emerald-200 text-slate-600 italic;
+}
+
+.prose figure {
+  @apply my-8;
+}
+
+.prose img {
+  @apply w-full h-auto rounded-lg;
+}
+
+/* Contact section styling matching testsite */
+.contact-section {
+  @apply border-2 border-black rounded-lg p-8 mt-12;
+}
+
+.contact-section h2 {
+  @apply text-3xl font-extrabold text-slate-900 mb-6;
+}
+
+.contact-grid {
+  @apply grid grid-cols-1 md:grid-cols-3 gap-8;
+}
+
+/* Footer */
+.site-footer {
+  @apply bg-slate-50 border-t border-slate-200 py-12 mt-auto;
+}
+
+.footer-grid {
+  @apply grid grid-cols-1 md:grid-cols-12 gap-8 max-w-4xl mx-auto px-6;
+}
+
+.footer-col {
+  @apply md:col-span-4;
+}
+
+.footer-col-links {
+  @apply md:col-span-2;
+}
+
+/* Header */
+.site-header {
+  @apply bg-white border-b border-slate-200;
+}
+
+.header-container {
+  @apply max-w-4xl mx-auto px-6 h-16 flex items-center justify-between;
+}
+
+/* Main content */
+.main-content {
+  @apply flex-grow max-w-4xl w-full mx-auto px-6 py-12;
+}
+
+/* Nav links */
+.nav-link {
+  @apply text-sm font-medium text-slate-600 hover:text-emerald-700 transition;
+}
+
+.nav-link-active {
+  @apply text-sm font-medium text-emerald-700;
+}
