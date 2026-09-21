@@ -13,7 +13,6 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 // Determine the current path for active nav state
 const currentPath = new URL(Astro.request.url).pathname;
 const navItems = [
-  { href: base + "/about", label: "About us" },
   { href: base + "/founders", label: "The Founders" },
   { href: base + "/our-partners", label: "Our Partners" },
   { href: base + "/impact", label: "Impact" },

@@ -9,7 +9,6 @@ content:
     label: Pages
     type: collection
     path: src/content/pages
-    format: md # or mdx
     fields:
       - name: title
         label: Page Title
