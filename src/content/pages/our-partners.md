@@ -4,9 +4,18 @@ description: The philanthropic circles and partners Pademelon Fund works with.
 ---
 The Pademelon Fund is an active member of philanthropic circles, including the Australian Environmental Grantmakers' Network (AEGN), the Nature Impact Collective (NIC), Groundswell Giving, and Philanthropy Australia.
 
-![Nature Impact Collective](/images/our-partners/nic.png)
+[AEGN logo]
 
-![Groundswell Giving](/images/our-partners/groundswell.png)
+*Brief explanation*
 
-![Philanthropy Australia](/images/our-partners/philanthropy-aus.png)
+[NIC logo]
 
+*Brief explanation*
+
+[Groundwell logo]
+
+*Brief explanation*
+
+[Philanthropy Australia logo]
+
+*Brief explanation*
