@@ -11,16 +11,22 @@ function withBase(pathname: string): string {
 
 export const homeHref = withBase('/');
 export const newsHref = withBase('/news');
-export const contactHref = withBase('/contact-us');
+export const contactHref = withBase('/contact');
 
-/** Primary navigation. Paths are site-absolute; the base path is added here. */
+/**
+ * Primary navigation. Paths are site-absolute; the base path is added here.
+ *
+ * Labels are deliberately short — all of them share one line with the wordmark
+ * down to the `--breakpoint-nav` width (see src/styles/global.css), so a long
+ * label here pushes the menu into the dropdown on tablets.
+ */
 export const navItems: NavItem[] = [
-  { href: withBase('/about-us'), label: 'About us' },
-  { href: withBase('/founders'), label: 'The Founders' },
-  { href: withBase('/our-partners'), label: 'Our Partners' },
+  { href: withBase('/about'), label: 'About' },
+  { href: withBase('/founders'), label: 'Founders' },
+  { href: withBase('/partners'), label: 'Partners' },
   { href: withBase('/impact'), label: 'Impact' },
   { href: withBase('/co-funding'), label: 'Co-funding' },
-  { href: contactHref, label: 'Contact us' },
+  { href: contactHref, label: 'Contact' },
   { href: newsHref, label: 'News' },
 ];
 

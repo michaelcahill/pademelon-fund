@@ -88,7 +88,7 @@ register: by convention an entry uses the folder named after it, so
   for squares or `16/9` for panoramas.
 - **Gotcha:** an image folder named after a page turns that page into a gallery.
   If the folder holds logos or other art that must keep its own shape, opt out
-  with `layout: page` (see `our-partners.md`).
+  with `layout: page` (see `partners.md`).
 
 Images are shown at their uploaded size — files in `public/` are not processed by
 Astro's asset pipeline, so upload appropriately sized files (~1400px wide works
@@ -102,7 +102,7 @@ from `src/pages/[...slug].astro`.
 
 ## Responsive behaviour
 
-- The menu collapses into a dropdown below `56rem`. The breakpoint is defined once
+- The menu collapses into a dropdown below `52rem`. The breakpoint is defined once
   as `--breakpoint-nav` in `src/styles/global.css`; the nav script reads it from
   CSS, and the one `@media` rule that needs it repeats the literal (CSS custom
   properties can't be used inside `@media`). Tap targets are at least 44px.

@@ -8,15 +8,15 @@
 @plugin "@tailwindcss/typography";
 
 @theme {
-  /* Collapse the menu below 56rem. The seven nav items plus the wordmark need
-   * roughly 47rem, and the site container is capped at 56rem (max-w-4xl), so
-   * there is little give above that width either.
+  /* Collapse the menu below 52rem. The seven short nav labels plus the wordmark
+   * need roughly 40rem, which leaves comfortable room at this width; if labels
+   * get longer, raise this rather than letting the bar wrap.
    *
    * This value is read by Nav.astro at runtime; the literal in the @media rule
    * below has to be kept in sync because custom properties can't be used
    * inside a media query.
    */
-  --breakpoint-nav: 56rem;
+  --breakpoint-nav: 52rem;
 }
 
 html {
@@ -120,7 +120,7 @@ html.js .nav-panel:not([data-open="true"]) {
   @apply block px-5 py-3 text-base font-medium text-slate-700 transition hover:bg-slate-50 hover:text-emerald-700;
 }
 
-@media (width >= 56rem) {
+@media (width >= 52rem) {
   .nav-bar {
     display: flex;
   }

@@ -1,8 +1,9 @@
 ---
 title: Our Partners
 description: The philanthropic circles and partners Pademelon Fund works with.
-# `public/images/our-partners/` exists (logos), which would otherwise turn this
-# page into a photo gallery. Logos need to keep their own shape, so opt out.
+# Required: this page owns public/images/partners/ (logos), and because that
+# folder matches the slug, `layout` would otherwise default to gallery and crop
+# the logos into tiles. They need to keep their own shape in prose instead.
 layout: page
 ---
 
@@ -22,6 +23,6 @@ The Pademelon Fund is an active member of philanthropic circles, including the A
 
 [Philanthropy Australia logo]
 
-![Philanthropy Australia](/images/our-partners/philanthropy-aus.png)
+![Philanthropy Australia](/images/partners/philanthropy-aus.png)
 
 *Brief explanation*

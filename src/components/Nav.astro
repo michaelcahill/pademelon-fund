@@ -131,7 +131,7 @@ const currentPath = Astro.url.pathname;
       const cssBreakpoint = getComputedStyle(document.documentElement)
         .getPropertyValue('--breakpoint-nav')
         .trim();
-      const wide = window.matchMedia(`(min-width: ${cssBreakpoint || '56rem'})`);
+      const wide = window.matchMedia(`(min-width: ${cssBreakpoint || '52rem'})`);
       const onChange = (event: MediaQueryListEvent) => {
         if (event.matches) setOpen(false);
       };
