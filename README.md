@@ -102,9 +102,10 @@ from `src/pages/[...slug].astro`.
 
 ## Responsive behaviour
 
-- The menu collapses into a dropdown below `52rem` (the breakpoint is
-  `--breakpoint-nav` in `src/styles/global.css`, mirrored in the nav CSS and
-  script). Tap targets are at least 44px.
+- The menu collapses into a dropdown below `56rem`. The breakpoint is defined once
+  as `--breakpoint-nav` in `src/styles/global.css`; the nav script reads it from
+  CSS, and the one `@media` rule that needs it repeats the literal (CSS custom
+  properties can't be used inside `@media`). Tap targets are at least 44px.
 - Without JavaScript the menu stays expanded as a list and the toggle button is
   hidden, so the navigation never depends on JS.
 - Uses `dvh` rather than `100vh`, plus `viewport-fit=cover` and safe-area

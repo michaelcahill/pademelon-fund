@@ -8,14 +8,15 @@
 @plugin "@tailwindcss/typography";
 
 @theme {
-  /* Collapse the menu below 52rem. The six nav items need ~45rem of horizontal
-   * room, and the site container is capped at 64rem, so Tailwind's default
-   * `md` (48rem) is too tight a fit.
+  /* Collapse the menu below 56rem. The seven nav items plus the wordmark need
+   * roughly 47rem, and the site container is capped at 56rem (max-w-4xl), so
+   * there is little give above that width either.
    *
-   * NOTE: keep the literal value in the nav media queries below in sync with
-   * this breakpoint — CSS custom properties can't be used inside @media.
+   * This value is read by Nav.astro at runtime; the literal in the @media rule
+   * below has to be kept in sync because custom properties can't be used
+   * inside a media query.
    */
-  --breakpoint-nav: 52rem;
+  --breakpoint-nav: 56rem;
 }
 
 html {
@@ -67,8 +68,11 @@ button {
  * Specificity note: the wide-screen overrides below reuse the same selectors as
  * the narrow-screen rules and rely on source order to win. Keep them after.
  * ------------------------------------------------------------------------ */
+/* A single gap value rather than a wider one on large screens: the container
+   * is capped at max-w-4xl, so extra letter spacing at desktop widths buys
+   * nothing and risks pushing the last item onto a second line. */
 .nav-bar {
-  @apply items-center gap-6 lg:gap-8;
+  @apply items-center gap-5 xl:gap-6;
   display: none;
 }
 
@@ -116,7 +120,7 @@ html.js .nav-panel:not([data-open="true"]) {
   @apply block px-5 py-3 text-base font-medium text-slate-700 transition hover:bg-slate-50 hover:text-emerald-700;
 }
 
-@media (width >= 52rem) {
+@media (width >= 56rem) {
   .nav-bar {
     display: flex;
   }

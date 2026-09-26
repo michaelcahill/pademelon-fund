@@ -15,6 +15,7 @@ export const contactHref = withBase('/contact-us');
 
 /** Primary navigation. Paths are site-absolute; the base path is added here. */
 export const navItems: NavItem[] = [
+  { href: withBase('/about-us'), label: 'About us' },
   { href: withBase('/founders'), label: 'The Founders' },
   { href: withBase('/our-partners'), label: 'Our Partners' },
   { href: withBase('/impact'), label: 'Impact' },
