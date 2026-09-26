@@ -1,0 +1,76 @@
+---
+import type { GalleryImage } from '../lib/galleries';
+import Lightbox from './Lightbox.astro';
+
+interface Props {
+  images: GalleryImage[];
+  /** Groups the images in the lightbox so prev/next stay inside this gallery. */
+  group?: string;
+  /**
+   * CSS aspect-ratio for each tile, e.g. `3/2` for landscape photos or `16/9`.
+   * Set it to match the source photos so nothing is visibly cropped.
+   */
+  aspect?: string;
+  /** Print each image's caption beneath the tile as well as in the lightbox. */
+  showCaptions?: boolean;
+}
+
+const { images, group = 'gallery', aspect = '3/2', showCaptions = false } = Astro.props;
+
+// A single image should not be shrunk into a thumbnail grid.
+const gridClass =
+  images.length === 1
+    ? 'grid-cols-1'
+    : images.length === 2
+      ? 'grid-cols-1 sm:grid-cols-2'
+      : 'grid-cols-2 md:grid-cols-3 xl:grid-cols-4';
+---
+
+{
+  images.length === 0 ? (
+    <p class="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-6 text-center text-sm text-slate-500">
+      No images in this gallery yet. Add image files to the gallery folder to see them here.
+    </p>
+  ) : (
+    <>
+      <ul class:list={['grid gap-3 sm:gap-4', gridClass]}>
+        {images.map((image, index) => (
+          <li>
+            <figure class="group">
+              <a
+                href={image.src}
+                class="block overflow-hidden rounded-lg bg-slate-100 ring-1 ring-slate-200 transition hover:ring-emerald-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
+                style={`aspect-ratio: ${aspect}`}
+                data-lightbox=""
+                data-gallery={group}
+                data-title={image.alt}
+                data-alt={image.alt}
+                aria-label={`Open image: ${image.alt || `image ${index + 1}`}`}
+              >
+                <img
+                  src={image.src}
+                  alt={image.alt}
+                  class="size-full object-cover transition duration-300 motion-safe:group-hover:scale-[1.03]"
+                  /* The inline aspect-ratio reserves the space, so no CLS even
+                     though these are unoptimised uploads. */
+                  style={`aspect-ratio: ${aspect}`}
+                  loading={index < 2 ? 'eager' : 'lazy'}
+                  decoding="async"
+                  fetchpriority={index === 0 ? 'high' : undefined}
+                />
+              </a>
+
+              {showCaptions && image.alt ? (
+                <figcaption class="mt-2 text-xs leading-snug text-slate-500">
+                  {image.alt}
+                </figcaption>
+              ) : null}
+            </figure>
+          </li>
+        ))}
+      </ul>
+
+      <Lightbox />
+    </>
+  )
+}

@@ -1,0 +1,38 @@
+---
+/**
+ * Tap-to-zoom lightbox for gallery images (glightbox).
+ *
+ * Include once per page that renders a GalleryGrid. Anchors marked with
+ * `data-lightbox` are picked up automatically; glightbox groups them by their
+ * `data-gallery` attribute, so each gallery navigates independently.
+ */
+import 'glightbox/dist/css/glightbox.min.css';
+---
+
+<script>
+  import GLightbox from 'glightbox';
+
+  // Guard against double initialisation if the component is included twice.
+  if (!document.documentElement.hasAttribute('data-lightbox-ready')) {
+    document.documentElement.setAttribute('data-lightbox-ready', '');
+
+    const triggers = document.querySelectorAll('[data-lightbox]');
+
+    if (triggers.length > 0) {
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      GLightbox({
+        selector: '[data-lightbox]',
+        // Swipe between images under a finger.
+        touchNavigation: true,
+        keyboardNavigation: true,
+        closeOnOutsideClick: true,
+        loop: true,
+        descPosition: 'bottom',
+        openEffect: reduceMotion ? 'none' : 'zoom',
+        closeEffect: reduceMotion ? 'none' : 'zoom',
+        slideEffect: reduceMotion ? 'none' : 'slide',
+      });
+    }
+  }
+</script>

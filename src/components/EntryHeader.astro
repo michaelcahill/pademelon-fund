@@ -1,0 +1,58 @@
+---
+import { withBase } from '../lib/paths';
+
+interface Props {
+  title: string;
+  /** Standfirst shown under the title. */
+  description?: string;
+  pubDate?: Date;
+  /** Site-absolute path (base-relative paths from frontmatter are fixed up). */
+  heroImage?: string;
+  heroAlt?: string;
+  /** Tailwind width class for the heading/lead text on wide pages. */
+  textClass?: string;
+}
+
+const {
+  title,
+  description,
+  pubDate,
+  heroImage,
+  heroAlt,
+  textClass = 'max-w-2xl',
+} = Astro.props;
+---
+
+<header>
+  {
+    pubDate ? (
+      <time
+        datetime={pubDate.toISOString()}
+        class="text-xs font-semibold uppercase tracking-wider text-emerald-700"
+      >
+        {pubDate.toLocaleDateString('en-AU', { dateStyle: 'long' })}
+      </time>
+    ) : null
+  }
+
+  <h1
+    class:list={[
+      'mt-1 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl',
+      textClass,
+    ]}
+  >
+    {title}
+  </h1>
+
+  {description ? <p class:list={['mt-3 text-lg leading-relaxed text-slate-600', textClass]}>{description}</p> : null}
+
+  {heroImage ? (
+    <img
+      src={withBase(heroImage)}
+      alt={heroAlt ?? ''}
+      class="mt-6 aspect-[3/2] w-full rounded-xl border border-slate-200 object-cover shadow-sm sm:rounded-2xl"
+      decoding="async"
+      fetchpriority="high"
+    />
+  ) : null}
+</header>

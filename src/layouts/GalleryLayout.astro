@@ -1,0 +1,66 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import EntryHeader from '../components/EntryHeader.astro';
+import GalleryGrid from '../components/GalleryGrid.astro';
+import type { GalleryImage } from '../lib/galleries';
+
+interface Props {
+  title: string;
+  description?: string;
+  pubDate?: Date;
+  /** Images to display, usually from `getGalleryImages()`. */
+  images: GalleryImage[];
+  /** Lightbox group name — defaults to the gallery folder. */
+  group?: string;
+  /** CSS aspect-ratio per tile; match the source photos (default `3/2`). */
+  aspect?: string;
+  showCaptions?: boolean;
+  backHref?: string;
+  backLabel?: string;
+}
+
+const {
+  title,
+  description,
+  pubDate,
+  images,
+  group,
+  aspect = '3/2',
+  showCaptions = false,
+  backHref,
+  backLabel = 'Back',
+} = Astro.props;
+---
+
+<BaseLayout title={title} description={description} wide>
+  <article>
+    <EntryHeader title={title} description={description} pubDate={pubDate} />
+
+    {
+      /* Any prose the entry supplies, kept to a readable measure while the
+         grid below uses the full width of the wide shell. */
+      <div class="mt-2 max-w-prose">
+        <slot name="intro" />
+      </div>
+    }
+
+    <div class="mt-8">
+      <GalleryGrid images={images} group={group ?? title} aspect={aspect} showCaptions={showCaptions} />
+    </div>
+
+    <slot />
+
+    {
+      backHref ? (
+        <div class="mt-12 border-t border-slate-200 pt-6">
+          <a
+            href={backHref}
+            class="inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-emerald-700 transition hover:text-emerald-800"
+          >
+            &larr; {backLabel}
+          </a>
+        </div>
+      ) : null
+    }
+  </article>
+</BaseLayout>

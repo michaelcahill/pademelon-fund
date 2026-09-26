@@ -1,6 +1,10 @@
 ---
 import { getCollection, render, type CollectionEntry } from 'astro:content';
-import Layout from '../layouts/Layout.astro';
+import GalleryLayout from '../layouts/GalleryLayout.astro';
+import HomeLayout from '../layouts/HomeLayout.astro';
+import PageLayout from '../layouts/PageLayout.astro';
+import { galleryFolderFor, getGalleryImages } from '../lib/galleries';
+import { pickLayout } from '../lib/layouts';
 
 export async function getStaticPaths() {
   // 'home' is rendered by src/pages/index.astro, not as a slug route.
@@ -17,15 +21,45 @@ interface Props {
 
 const { page } = Astro.props;
 const { Content } = await render(page);
+
+// A page becomes a gallery when its image folder has images in it.
+const folder = galleryFolderFor(page.data, page.id);
+const images = getGalleryImages(folder);
+const layout = pickLayout(page.data.layout, images.length);
 ---
 
-<Layout title={page.data.title} description={page.data.description}>
-  <article>
-    <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight mb-8">
-      {page.data.title}
-    </h1>
-    <div class="prose prose-slate prose-emerald max-w-none">
+{
+  layout === 'gallery' ? (
+    <GalleryLayout
+      title={page.data.title}
+      description={page.data.description}
+      images={images}
+      group={folder}
+      aspect={page.data.galleryAspect}
+    >
+      <div slot="intro" class="prose prose-slate prose-emerald max-w-none">
+        <Content />
+      </div>
+    </GalleryLayout>
+  ) : layout === 'home' ? (
+    <HomeLayout
+      title={page.data.title}
+      description={page.data.description}
+      heroImage={page.data.heroImage}
+      heroAlt={page.data.heroAlt ?? page.data.title}
+    >
+      <div class="prose prose-slate prose-emerald max-w-none">
+        <Content />
+      </div>
+    </HomeLayout>
+  ) : (
+    <PageLayout
+      title={page.data.title}
+      description={page.data.description}
+      heroImage={page.data.heroImage}
+      heroAlt={page.data.heroAlt}
+    >
       <Content />
-    </div>
-  </article>
-</Layout>
+    </PageLayout>
+  )
+}

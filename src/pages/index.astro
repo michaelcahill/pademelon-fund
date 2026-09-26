@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
-import Layout from '../layouts/Layout.astro';
+import HomeLayout from '../layouts/HomeLayout.astro';
+import { contactHref, newsHref } from '../lib/navigation';
 
 const home = await getCollection('pages', ({ id }) => id === 'home').then(
   (pages) => pages[0],
@@ -13,13 +14,17 @@ if (!home) {
 const { Content } = await render(home);
 ---
 
-<Layout title={home.data.title} description={home.data.description}>
-  <div class="max-w-3xl">
-    <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight mb-6">
-      {home.data.title}
-    </h1>
-    <div class="text-lg text-slate-600 leading-relaxed [&_a]:text-emerald-700 [&_a]:hover:text-emerald-800 [&_a]:font-medium [&_a]:transition">
-      <Content />
-    </div>
+<HomeLayout
+  title={home.data.title}
+  description={home.data.description}
+  heroImage={home.data.heroImage}
+  heroAlt={home.data.heroAlt ?? home.data.title}
+  ctas={[
+    { href: newsHref, label: 'Read the news' },
+    { href: contactHref, label: 'Contact us' },
+  ]}
+>
+  <div class="prose prose-slate prose-emerald max-w-none">
+    <Content />
   </div>
-</Layout>
+</HomeLayout>

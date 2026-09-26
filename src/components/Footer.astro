@@ -1,0 +1,63 @@
+---
+import { contactHref, homeHref, navItems, newsHref } from '../lib/navigation';
+
+const { wide = false } = Astro.props;
+---
+
+<footer class="site-footer">
+  <div
+    class:list={[
+      'mx-auto grid gap-8 px-4 py-12 sm:px-6 md:grid-cols-2 lg:px-8',
+      wide ? 'max-w-7xl lg:grid-cols-[2fr_1fr_1fr]' : 'max-w-3xl lg:grid-cols-[2fr_1fr_1fr]',
+    ]}
+  >
+    <div>
+      <h2 class="mb-3 text-xl font-bold text-slate-900">
+        <a href={homeHref} class="hover:text-emerald-700 transition">Pademelon Fund</a>
+      </h2>
+      <p class="text-sm leading-relaxed text-slate-500">
+        Supporting grassroots action for nature, First Nations and climate across Australia.
+      </p>
+    </div>
+
+    <div>
+      <h3 class="mb-3 text-sm font-semibold text-slate-900">Pages</h3>
+      <ul class="space-y-2 text-sm">
+        {
+          navItems.map((item) => (
+            <li>
+              <a href={item.href} class="text-slate-500 transition hover:text-emerald-700">
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <div>
+      <h3 class="mb-3 text-sm font-semibold text-slate-900">Connect</h3>
+      <ul class="space-y-2 text-sm">
+        <li>
+          <a href={newsHref} class="text-slate-500 transition hover:text-emerald-700">
+            News
+          </a>
+        </li>
+        <li>
+          <a href={contactHref} class="text-slate-500 transition hover:text-emerald-700">
+            Contact
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div
+    class:list={[
+      'mx-auto border-t border-slate-200 px-4 pb-6 pt-6 text-center text-xs text-slate-400 sm:px-6 lg:px-8',
+      wide ? 'max-w-7xl' : 'max-w-3xl',
+    ]}
+  >
+    &copy; {new Date().getFullYear()} Pademelon Fund. All rights reserved.
+  </div>
+</footer>

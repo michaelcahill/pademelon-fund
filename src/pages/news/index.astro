@@ -1,34 +1,83 @@
 ---
 import { getCollection } from 'astro:content';
-import Layout from '../../layouts/Layout.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { countGalleryImages, galleryFolderFor } from '../../lib/galleries';
+import { withBase } from '../../lib/paths';
 
-const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const newsPosts = (await getCollection('news')).sort(
-  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
 ---
 
-<Layout title="News & Updates" description="Latest articles and news updates.">
-  <div class="max-w-2xl">
-    <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight mb-8">
-      News & Updates
-    </h1>
-    <div class="space-y-8">
-      {newsPosts.map((post) => (
-        <article class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-          <time class="text-xs font-semibold uppercase tracking-wider text-emerald-700">
-            {post.data.pubDate.toLocaleDateString('en-US', { dateStyle: 'medium' })}
-          </time>
-          <h2 class="text-xl font-bold text-slate-900 mt-2 hover:text-emerald-700 transition">
-            <a href={base + `/news/${post.id}`}>
-              {post.data.title}
-            </a>
-          </h2>
-          <p class="text-slate-600 mt-2 text-sm leading-relaxed">
-            {post.data.description}
-          </p>
-        </article>
-      ))}
-    </div>
-  </div>
-</Layout>
+<BaseLayout
+  title="News & Updates"
+  description="Latest articles and news updates from Pademelon Fund."
+>
+  <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+    News &amp; Updates
+  </h1>
+
+  {
+    newsPosts.length === 0 ? (
+      <p class="mt-6 text-slate-600">No news posted yet. Check back soon.</p>
+    ) : (
+      // One column on phones, two from small tablets up.
+      <ul class="mt-8 grid gap-6 sm:grid-cols-2">
+        {newsPosts.map((post) => {
+          const photoCount = countGalleryImages(galleryFolderFor(post.data, post.id));
+
+          return (
+            <li class="flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:border-emerald-200 hover:shadow-md">
+              {post.data.image ? (
+                <img
+                  src={withBase(post.data.image)}
+                  alt={post.data.imageAlt ?? ''}
+                  class="aspect-[16/9] w-full object-cover"
+                  loading="lazy"
+                  decoding="async"
+                />
+              ) : null}
+
+              <div class="flex flex-grow flex-col p-5">
+                <time
+                  datetime={post.data.pubDate.toISOString()}
+                  class="text-xs font-semibold uppercase tracking-wider text-emerald-700"
+                >
+                  {post.data.pubDate.toLocaleDateString('en-AU', { dateStyle: 'medium' })}
+                </time>
+
+                <h2 class="mt-2 text-lg font-bold leading-snug text-slate-900">
+                  <a
+                    href={withBase(`/news/${post.id}`)}
+                    class="transition hover:text-emerald-700"
+                  >
+                    {post.data.title}
+                  </a>
+                </h2>
+
+                <p class="mt-2 grow text-sm leading-relaxed text-slate-600">
+                  {post.data.description}
+                </p>
+
+                <div class="mt-4 flex items-center gap-3 text-xs font-medium text-emerald-700">
+                  <a
+                    href={withBase(`/news/${post.id}`)}
+                    class="inline-flex min-h-11 items-center transition hover:text-emerald-800"
+                  >
+                    Read more &rarr;
+                  </a>
+
+                  {photoCount > 0 ? (
+                    <span class="text-slate-500">
+                      · {photoCount} photo{photoCount === 1 ? '' : 's'}
+                    </span>
+                  ) : null}
+                </div>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    )
+  }
+</BaseLayout>

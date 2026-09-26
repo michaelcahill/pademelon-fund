@@ -1,0 +1,84 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import { withBase } from '../lib/paths';
+
+interface CallToAction {
+  href: string;
+  label: string;
+}
+
+interface Props {
+  title: string;
+  /** Lead paragraph under the headline. */
+  description?: string;
+  /** Site-absolute path, e.g. `/images/about/team.jpg` (frontmatter style). */
+  heroImage?: string;
+  heroAlt?: string;
+  /** First is rendered as the primary button; any second one is secondary. */
+  ctas?: CallToAction[];
+}
+
+const { title, description, heroImage, heroAlt, ctas = [] } = Astro.props;
+---
+
+<BaseLayout title={title} description={description}>
+  <div class="overflow-hidden">
+    <!-- Hero -->
+    <section
+      class:list={[
+        'grid items-center gap-8',
+        heroImage ? 'lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-12' : '',
+      ]}
+    >
+      <div>
+        <h1 class="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl">
+          {title}
+        </h1>
+
+        {
+          description ? (
+            <p class="mt-5 text-lg leading-relaxed text-slate-600 sm:text-xl">{description}</p>
+          ) : null
+        }
+
+        {
+          ctas.length > 0 ? (
+            <div class="mt-8 flex flex-wrap gap-3">
+              {ctas.map((cta, index) => (
+                <a
+                  href={cta.href}
+                  class:list={[
+                    // 44px+ tap target for phones.
+                    'inline-flex min-h-11 items-center justify-center rounded-lg px-5 text-sm font-semibold transition',
+                    index === 0
+                      ? 'bg-emerald-700 text-white hover:bg-emerald-800'
+                      : 'border border-slate-300 text-slate-700 hover:border-emerald-600 hover:text-emerald-700',
+                  ]}
+                >
+                  {cta.label}
+                </a>
+              ))}
+            </div>
+          ) : null
+        }
+      </div>
+
+      {
+        heroImage ? (
+          <img
+            src={withBase(heroImage)}
+            alt={heroAlt ?? ''}
+            class="aspect-[3/2] w-full rounded-xl object-cover shadow-sm sm:rounded-2xl"
+            decoding="async"
+            fetchpriority="high"
+          />
+        ) : null
+      }
+    </section>
+
+    <!-- Page sections (news preview, gallery teaser, etc.) -->
+    <div class="mt-14">
+      <slot />
+    </div>
+  </div>
+</BaseLayout>

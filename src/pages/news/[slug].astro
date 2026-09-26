@@ -1,8 +1,10 @@
 ---
 import { getCollection, render, type CollectionEntry } from 'astro:content';
-import Layout from '../../layouts/Layout.astro';
-
-const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+import GalleryLayout from '../../layouts/GalleryLayout.astro';
+import PageLayout from '../../layouts/PageLayout.astro';
+import { galleryFolderFor, getGalleryImages } from '../../lib/galleries';
+import { pickLayout } from '../../lib/layouts';
+import { newsHref } from '../../lib/navigation';
 
 export async function getStaticPaths() {
   const posts = await getCollection('news');
@@ -18,37 +20,40 @@ interface Props {
 
 const { post } = Astro.props;
 const { Content } = await render(post);
+
+// A post becomes a gallery when its image folder has images in it.
+const folder = galleryFolderFor(post.data, post.id);
+const images = getGalleryImages(folder);
+const layout = pickLayout(post.data.layout, images.length);
 ---
 
-<Layout title={post.data.title} description={post.data.description}>
-  <article class="max-w-3xl mx-auto">
-    <header class="mb-8">
-      <time class="text-sm font-medium text-emerald-700">
-        {post.data.pubDate.toLocaleDateString('en-US', { dateStyle: 'long' })}
-      </time>
-      <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight mt-2 mb-4">
-        {post.data.title}
-      </h1>
-      <p class="text-lg text-slate-600 leading-relaxed">
-        {post.data.description}
-      </p>
-      {post.data.image && (
-        <img
-          src={base + post.data.image}
-          alt={post.data.title}
-          class="w-full h-72 object-cover rounded-2xl mt-6 border border-slate-200 shadow-sm"
-        />
-      )}
-    </header>
-
-    <div class="prose prose-slate prose-emerald max-w-none">
+{
+  layout === 'gallery' ? (
+    <GalleryLayout
+      title={post.data.title}
+      description={post.data.description}
+      pubDate={post.data.pubDate}
+      images={images}
+      group={folder}
+      aspect={post.data.galleryAspect}
+      backHref={newsHref}
+      backLabel="Back to all news"
+    >
+      <div slot="intro" class="prose prose-slate prose-emerald max-w-none">
+        <Content />
+      </div>
+    </GalleryLayout>
+  ) : (
+    <PageLayout
+      title={post.data.title}
+      description={post.data.description}
+      pubDate={post.data.pubDate}
+      heroImage={post.data.image}
+      heroAlt={post.data.imageAlt ?? post.data.title}
+      backHref={newsHref}
+      backLabel="Back to all news"
+    >
       <Content />
-    </div>
-
-    <div class="mt-12 pt-6 border-t border-slate-200">
-      <a href={base + "/news"} class="text-sm font-semibold text-emerald-700 hover:text-emerald-800">
-        &larr; Back to all news
-      </a>
-    </div>
-  </article>
-</Layout>
+    </PageLayout>
+  )
+}

@@ -1,0 +1,61 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import EntryHeader from '../components/EntryHeader.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  pubDate?: Date;
+  /** Site-absolute path, e.g. `/images/about/team.jpg` (frontmatter style). */
+  heroImage?: string;
+  heroAlt?: string;
+  /** Renders a "back" link after the article body. */
+  backHref?: string;
+  backLabel?: string;
+  /** Only for full-bleed pages that still want prose styling. */
+  wide?: boolean;
+}
+
+const {
+  title,
+  description,
+  pubDate,
+  heroImage,
+  heroAlt,
+  backHref,
+  backLabel = 'Back',
+  wide = false,
+} = Astro.props;
+---
+
+<BaseLayout title={title} description={description} wide={wide}>
+  <article>
+    <EntryHeader
+      title={title}
+      description={description}
+      pubDate={pubDate}
+      heroImage={heroImage}
+      heroAlt={heroAlt}
+    />
+
+    <!-- The typography plugin handles headings, lists, quotes and media. -->
+    <div class="prose prose-slate prose-emerald mt-8 max-w-none">
+      <slot />
+    </div>
+
+    {
+      backHref ? (
+        <div class="mt-12 border-t border-slate-200 pt-6">
+          <a
+            href={backHref}
+            class="inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-emerald-700 transition hover:text-emerald-800"
+          >
+            &larr; {backLabel}
+          </a>
+        </div>
+      ) : null
+    }
+
+    <slot name="after" />
+  </article>
+</BaseLayout>

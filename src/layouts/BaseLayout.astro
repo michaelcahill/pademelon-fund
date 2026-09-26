@@ -1,0 +1,75 @@
+---
+import '../styles/global.css';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import { withBase } from '../lib/paths';
+
+interface Props {
+  title: string;
+  description?: string;
+  /**
+   * Use the wide page shell (max-w-7xl) instead of the standard reading
+   * measure (max-w-4xl, as used across the rest of the site). Header and
+   * footer follow the shell so everything stays aligned. Galleries want
+   * `wide`; text pages do not.
+   */
+  wide?: boolean;
+}
+
+const {
+  title,
+  description = 'Supporting grassroots action for nature, First Nations and climate across Australia.',
+  wide = false,
+} = Astro.props;
+
+const container = wide ? 'max-w-7xl' : 'max-w-4xl';
+const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin).href;
+---
+
+<!DOCTYPE html>
+<html lang="en" class="min-h-screen-safe">
+  <head>
+    <meta charset="utf-8" />
+    <!-- viewport-fit=cover lets us pad around the iPhone notch ourselves. -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <meta name="description" content={description} />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#ffffff" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/png" href={withBase('/favicon.png')} />
+    <link rel="apple-touch-icon" href={withBase('/favicon.png')} />
+
+    <!-- Recorded before paint so narrow screens never flash an open menu. -->
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
+
+    <slot name="head" />
+  </head>
+
+  <body class="flex min-h-screen-safe flex-col bg-white text-slate-800 antialiased">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-emerald-700 focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white"
+    >
+      Skip to content
+    </a>
+
+    <Nav wide={wide} />
+
+    <main id="main" class:list={['flex-grow py-10 sm:py-12', container, 'mx-auto w-full px-4 sm:px-6 lg:px-8']}>
+      <slot />
+    </main>
+
+    <Footer wide={wide} />
+  </body>
+</html>

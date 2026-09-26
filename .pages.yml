@@ -20,6 +20,36 @@ content:
         type: string
         required: false
 
+      - name: heroImage
+        label: Hero Image (upload, or path such as /images/about/team.jpg)
+        type: image
+        required: false
+
+      - name: heroAlt
+        label: Hero Image Alt Text
+        type: string
+        required: false
+
+      # Layout options: auto (default) | page | home | gallery
+      # "auto" means: gallery when the gallery folder has images, else page.
+      - name: layout
+        label: "Layout (auto, page, home or gallery)"
+        type: string
+        required: false
+
+      # Folder inside public/images holding this page's gallery images.
+      # Leave blank to use a folder named after the page.
+      - name: gallery
+        label: Gallery Folder (optional)
+        type: string
+        required: false
+
+      # CSS aspect-ratio for gallery tiles, e.g. 3/2, 1/1, 16/9
+      - name: galleryAspect
+        label: "Gallery Tile Aspect Ratio (default 3/2)"
+        type: string
+        required: false
+
       - name: body
         label: Page Content
         type: rich-text
@@ -50,6 +80,30 @@ content:
       - name: image
         label: Featured Image
         type: image
+        required: false
+
+      - name: imageAlt
+        label: Featured Image Alt Text
+        type: string
+        required: false
+
+      # Layout options: auto (default) | page | gallery
+      - name: layout
+        label: "Layout (auto, page or gallery)"
+        type: string
+        required: false
+
+      # Folder inside public/images holding this article's gallery images.
+      # Leave blank to use a folder named after the article.
+      - name: gallery
+        label: Gallery Folder (optional)
+        type: string
+        required: false
+
+      # CSS aspect-ratio for gallery tiles, e.g. 3/2, 1/1, 16/9
+      - name: galleryAspect
+        label: "Gallery Tile Aspect Ratio (default 3/2)"
+        type: string
         required: false
 
       - name: body
