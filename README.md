@@ -27,15 +27,16 @@ npm run dev      # start local dev server at http://localhost:4321
 │   │   ├── pages/       # Standalone pages (About, etc.)
 │   │   └── news/        # Blog-style news posts
 │   ├── layouts/
-│   │   ├── BaseLayout.astro    # <html> shell, nav, footer; `wide` prop
+│   │   ├── BaseLayout.astro    # <html> shell, nav, footer (uniform width)
 │   │   ├── HomeLayout.astro    # Hero + CTA buttons + page sections
 │   │   ├── PageLayout.astro    # Title + prose article
-│   │   └── GalleryLayout.astro # Wide grid layout (pages and news items)
+│   │   └── GalleryLayout.astro # Grid layout (pages and news items)
 │   ├── lib/
 │   │   ├── galleries.ts        # Lists images in a gallery folder
 │   │   ├── layouts.ts          # Chooses a layout for an entry
 │   │   ├── navigation.ts       # Shared nav items + active-link logic
-│   │   └── paths.ts            # Base-path helper for GitHub Pages
+│   │   ├── paths.ts            # Base-path helper for GitHub Pages
+│   │   └── shell.ts            # Single page-width constant (nav + main + footer)
 │   ├── pages/
 │   │   ├── index.astro          # Home page (HomeLayout)
 │   │   ├── [...slug].astro      # Pages collection (page / home / gallery)
@@ -51,15 +52,17 @@ npm run dev      # start local dev server at http://localhost:4321
 
 ## Layouts
 
-| Layout | Use it for | Page width |
-| :--- | :--- | :--- |
-| `HomeLayout` | The home page: headline, standfirst, CTA buttons, optional hero image | standard |
-| `PageLayout` | Ordinary pages and news posts with prose | standard |
-| `GalleryLayout` | Pages and news items whose images live in a gallery folder | wide |
+| Layout | Use it for |
+| :--- | :--- |
+| `HomeLayout` | The home page: headline, standfirst, CTA buttons, optional hero image |
+| `PageLayout` | Ordinary pages and news posts with prose |
+| `GalleryLayout` | Pages and news items whose images live in a gallery folder |
 
-All three are built on `BaseLayout`, which owns `<html>`, the nav, the footer and
-the page width. Pass `wide` to switch the whole shell (header and footer
-included) from `max-w-4xl` to `max-w-7xl`.
+All three are built on `BaseLayout`, which owns `<html>`, the nav and the footer.
+Every page uses one shell width — `SHELL_CONTAINER` in `src/lib/shell.ts`
+(`max-w-4xl`) — applied to the header, main and footer, so the nav bar never
+changes width as you navigate. There is no `wide` option: gallery grids get their
+impact from tiles inside the standard shell rather than a wider document.
 
 Which layout an entry uses is decided by `pickLayout()` in `src/lib/layouts.ts`:
 

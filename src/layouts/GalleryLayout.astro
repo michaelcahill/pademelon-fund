@@ -32,13 +32,13 @@ const {
 } = Astro.props;
 ---
 
-<BaseLayout title={title} description={description} wide>
+<BaseLayout title={title} description={description}>
   <article>
     <EntryHeader title={title} description={description} pubDate={pubDate} />
 
     {
-      /* Any prose the entry supplies, kept to a readable measure while the
-         grid below uses the full width of the wide shell. */
+      /* Any prose the entry supplies is kept to a readable measure; the grid
+         below uses the full width of the standard page shell. */
       <div class="mt-2 max-w-prose">
         <slot name="intro" />
       </div>

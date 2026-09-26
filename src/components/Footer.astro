@@ -1,14 +1,13 @@
 ---
 import { contactHref, homeHref, navItems, newsHref } from '../lib/navigation';
-
-const { wide = false } = Astro.props;
+import { SHELL_CONTAINER } from '../lib/shell';
 ---
 
 <footer class="site-footer">
   <div
     class:list={[
-      'mx-auto grid gap-8 px-4 py-12 sm:px-6 md:grid-cols-2 lg:px-8',
-      wide ? 'max-w-7xl lg:grid-cols-[2fr_1fr_1fr]' : 'max-w-3xl lg:grid-cols-[2fr_1fr_1fr]',
+      'grid gap-8 py-12 md:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr]',
+      SHELL_CONTAINER,
     ]}
   >
     <div>
@@ -54,8 +53,8 @@ const { wide = false } = Astro.props;
 
   <div
     class:list={[
-      'mx-auto border-t border-slate-200 px-4 pb-6 pt-6 text-center text-xs text-slate-400 sm:px-6 lg:px-8',
-      wide ? 'max-w-7xl' : 'max-w-3xl',
+      'border-t border-slate-200 pb-6 pt-6 text-center text-xs text-slate-400',
+      SHELL_CONTAINER,
     ]}
   >
     &copy; {new Date().getFullYear()} Pademelon Fund. All rights reserved.

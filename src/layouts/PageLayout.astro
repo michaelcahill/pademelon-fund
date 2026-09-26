@@ -12,8 +12,6 @@ interface Props {
   /** Renders a "back" link after the article body. */
   backHref?: string;
   backLabel?: string;
-  /** Only for full-bleed pages that still want prose styling. */
-  wide?: boolean;
 }
 
 const {
@@ -24,11 +22,10 @@ const {
   heroAlt,
   backHref,
   backLabel = 'Back',
-  wide = false,
 } = Astro.props;
 ---
 
-<BaseLayout title={title} description={description} wide={wide}>
+<BaseLayout title={title} description={description}>
   <article>
     <EntryHeader
       title={title}

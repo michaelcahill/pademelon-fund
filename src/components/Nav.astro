@@ -1,20 +1,15 @@
 ---
 import { isActive, navItems, homeHref } from '../lib/navigation';
+import { SHELL_CONTAINER } from '../lib/shell';
 
-interface Props {
-  /** Must match the width used by BaseLayout so the bar aligns with content. */
-  wide?: boolean;
-}
-
-const { wide = false } = Astro.props;
 const currentPath = Astro.url.pathname;
 ---
 
 <header class="site-header" data-site-header>
   <div
     class:list={[
-      'relative mx-auto flex h-16 items-center justify-between gap-4',
-      wide ? 'max-w-7xl px-4 sm:px-6 lg:px-8' : 'max-w-4xl px-4 sm:px-6 lg:px-8',
+      'relative flex h-16 items-center justify-between gap-4',
+      SHELL_CONTAINER,
     ]}
   >
     <a

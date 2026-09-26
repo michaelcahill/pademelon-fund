@@ -18,12 +18,15 @@ interface Props {
 const { images, group = 'gallery', aspect = '3/2', showCaptions = false } = Astro.props;
 
 // A single image should not be shrunk into a thumbnail grid.
+// Three columns is the widest useful option inside the page shell (max-w-4xl):
+// a fourth column would make each tile too small to see, so it is not used even
+// on large screens.
 const gridClass =
   images.length === 1
     ? 'grid-cols-1'
     : images.length === 2
       ? 'grid-cols-1 sm:grid-cols-2'
-      : 'grid-cols-2 md:grid-cols-3 xl:grid-cols-4';
+      : 'grid-cols-2 md:grid-cols-3';
 ---
 
 {

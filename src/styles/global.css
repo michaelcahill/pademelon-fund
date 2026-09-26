@@ -45,7 +45,9 @@ button {
   @apply touch-manipulation;
 }
 
-/* Header / footer chrome (widths are set per-layout in BaseLayout). */
+/* Header / footer chrome. Widths come from SHELL_CONTAINER (src/lib/shell.ts)
+ * and are identical on every page, so the nav bar never resizes as you move
+ * between text and gallery pages. */
 .site-header {
   @apply sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur;
   /* Respect the iPhone notch / status bar when the header is stuck to the top. */

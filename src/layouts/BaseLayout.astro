@@ -3,26 +3,17 @@ import '../styles/global.css';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import { withBase } from '../lib/paths';
+import { SHELL_CONTAINER } from '../lib/shell';
 
 interface Props {
   title: string;
   description?: string;
-  /**
-   * Use the wide page shell (max-w-7xl) instead of the standard reading
-   * measure (max-w-4xl, as used across the rest of the site). Header and
-   * footer follow the shell so everything stays aligned. Galleries want
-   * `wide`; text pages do not.
-   */
-  wide?: boolean;
 }
 
 const {
   title,
   description = 'Supporting grassroots action for nature, First Nations and climate across Australia.',
-  wide = false,
 } = Astro.props;
-
-const container = wide ? 'max-w-7xl' : 'max-w-4xl';
 const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin).href;
 ---
 
@@ -64,12 +55,12 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin).hr
       Skip to content
     </a>
 
-    <Nav wide={wide} />
+    <Nav />
 
-    <main id="main" class:list={['flex-grow py-10 sm:py-12', container, 'mx-auto w-full px-4 sm:px-6 lg:px-8']}>
+    <main id="main" class:list={['flex-grow py-10 sm:py-12', SHELL_CONTAINER]}>
       <slot />
     </main>
 
-    <Footer wide={wide} />
+    <Footer />
   </body>
 </html>
