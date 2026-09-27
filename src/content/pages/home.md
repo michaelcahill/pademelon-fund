@@ -1,11 +1,11 @@
 ---
 title: Pademelon Fund
-description: Supporting grassroots action for nature, First Nations and climate across Australia.
-layout: home
-heroImage: /images/about/table.jpg
+description: Supporting grassroots action for nature, First Nations and climate
+  across Australia.
+heroImage: /images/pademelon-logo-1.png
 heroAlt: People working together around a table outdoors.
+layout: home
 ---
-
 We back small, determined groups doing the practical work of the bush:
 on-country land management, reef and wetland repair, and the communities that
 keep it going.
