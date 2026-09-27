@@ -5,6 +5,7 @@ description: Supporting grassroots action for nature, First Nations and climate
 heroImage: /images/pademelon-logo-1.png
 heroAlt: People working together around a table outdoors.
 layout: home
+galleryAspect: 16/9
 ---
 We back small, determined groups doing the practical work of the bush:
 on-country land management, reef and wetland repair, and the communities that
