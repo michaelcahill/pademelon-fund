@@ -109,3 +109,34 @@ content:
       - name: body
         label: Content
         type: rich-text
+
+  # Partner organisations (listed on /partners)
+  - name: partners
+    label: Partners
+    type: collection
+    path: src/content/partners
+    fields:
+      - name: name
+        label: Partner Name
+        type: string
+        required: true
+
+      - name: description
+        label: Description
+        type: string
+        required: false
+
+      - name: logo
+        label: Logo (upload, or path such as /images/partners/nic.png)
+        type: image
+        required: false
+
+      - name: link
+        label: Website (optional)
+        type: string
+        required: false
+
+      - name: order
+        label: Sort Order (lower first, default 0)
+        type: number
+        required: false

@@ -50,4 +50,18 @@ const news = defineCollection({
   }),
 });
 
-export const collections = { pages, news };
+const partners = defineCollection({
+  loader: glob({ base: 'src/content/partners', pattern: '**/*.md' }),
+  schema: z.object({
+    name: z.string(),
+    description: z.string().optional(),
+    /** Site-absolute path, e.g. /images/partners/nic.png */
+    logo: z.string().optional(),
+    /** Optional organisation website. */
+    link: z.string().optional(),
+    /** Sort order (lower first); defaults to 0. */
+    order: z.number().optional(),
+  }),
+});
+
+export const collections = { pages, news, partners };
