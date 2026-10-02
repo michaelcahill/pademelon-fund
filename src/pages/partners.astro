@@ -1,0 +1,94 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { withBase } from '../lib/paths';
+
+interface Partner {
+  name: string;
+  description?: string;
+  /** Site-absolute path, e.g. /images/partners/nic.png */
+  logo?: string;
+  /** Optional organisation website. */
+  link?: string;
+  order?: number;
+}
+
+const partners = (
+  await getCollection('partners')
+)
+  .sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
+  .map((p) => p.data);
+---
+
+<BaseLayout
+  title="Our Partners"
+  description="The philanthropic circles and partners Pademelon Fund works with."
+>
+  <article class="max-w-prose">
+    <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+      Our Partners
+    </h1>
+    <p class="mt-5 text-lg leading-relaxed text-slate-600">
+      The Pademelon Fund is an active member of philanthropic circles, including
+      the Australian Environmental Grantmakers' Network (AEGN), the Nature Impact
+      Collective (NIC), Groundswell Giving, and Philanthropy Australia.
+    </p>
+  </article>
+
+  <ul class="mt-10 grid gap-6 sm:grid-cols-2">
+    {partners.map((partner) => (
+      <li
+        class="flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
+      >
+        {partner.logo ? (
+          partner.link ? (
+            <a
+              href={partner.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex"
+            >
+              <img
+                src={withBase(partner.logo)}
+                alt={partner.name}
+                class="h-20 w-full object-contain"
+                decoding="async"
+              />
+            </a>
+          ) : (
+            <img
+              src={withBase(partner.logo)}
+              alt={partner.name}
+              class="h-20 w-full object-contain"
+              decoding="async"
+            />
+          )
+        ) : (
+          partner.link ? (
+            <a
+              href={partner.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-base font-bold text-emerald-700 transition hover:text-emerald-800"
+            >
+              {partner.name}
+            </a>
+          ) : (
+            <span class="text-base font-bold text-slate-900">{partner.name}</span>
+          )
+        )}
+
+        <h2 class="mt-4 text-lg font-bold leading-snug text-slate-900">
+          {partner.name}
+        </h2>
+
+        {partner.description ? (
+          <p class="mt-2 grow text-sm leading-relaxed text-slate-600">
+            {partner.description}
+          </p>
+        ) : null}
+
+      </li>
+    ))}
+  </ul>
+</BaseLayout>
