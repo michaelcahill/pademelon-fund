@@ -6,8 +6,8 @@ import { withBase } from './paths';
  * Galleries are plain folders of images — no database, no index file.
  *
  * A gallery is any directory under `public/images/`. By convention a page or
- * news item uses the folder named after its slug (`src/content/pages/impact.md`
- * → `public/images/impact/`), which can be overridden per entry with the
+ * impact post uses the folder named after its slug (`src/content/pages/about.md`
+ * → `public/images/about/`), which can be overridden per entry with the
  * `gallery` frontmatter field (e.g. `gallery: about` or `gallery: 2024/trip`).
  *
  * Images are shown in filename order, so prefix names (`01-arrival.jpg`,

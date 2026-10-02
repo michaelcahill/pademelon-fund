@@ -7,7 +7,7 @@ heroAlt: People working together around a table outdoors.
 layout: home
 galleryAspect: 16/9
 ---
-We support grassroots action for nature, First Nations and climate across Australia
+We support grassroots action for nature, First Nations and climate across Australia.
 
-Explore our [news](news) to learn about our work and impact, or get in touch via
+Explore our [impact stories](impact) to learn about our work, or get in touch via
 [contact us](contact).

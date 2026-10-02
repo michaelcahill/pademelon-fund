@@ -10,7 +10,7 @@ function withBase(pathname: string): string {
 }
 
 export const homeHref = withBase('/');
-export const newsHref = withBase('/news');
+export const impactHref = withBase('/impact');
 export const contactHref = withBase('/contact');
 
 /**
@@ -24,15 +24,14 @@ export const navItems: NavItem[] = [
   { href: withBase('/about'), label: 'About' },
   { href: withBase('/founders'), label: 'Founders' },
   { href: withBase('/partners'), label: 'Partners' },
-  { href: withBase('/impact'), label: 'Impact' },
   { href: withBase('/co-funding'), label: 'Co-funding' },
+  { href: impactHref, label: 'Impact' },
   { href: contactHref, label: 'Contact' },
-  { href: newsHref, label: 'News' },
 ];
 
 /**
  * Highlights the current section, tolerating trailing slashes and matching
- * children (e.g. `/news/a-post` keeps `News` active).
+ * children (e.g. `/impact/a-post` keeps `Impact` active).
  */
 export function isActive(currentPathname: string, href: string): boolean {
   const strip = (value: string) => value.replace(/\/+$/, '');

@@ -4,26 +4,31 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { countGalleryImages, galleryFolderFor } from '../../lib/galleries';
 import { withBase } from '../../lib/paths';
 
-const newsPosts = (await getCollection('news')).sort(
+const impactPosts = (await getCollection('impact')).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
+
+// Shared by the <meta> tags and the visible standfirst so they cannot drift.
+const description =
+  "Explore the impact of Pademelon Fund's work — the projects and people we support.";
 ---
 
-<BaseLayout
-  title="News & Updates"
-  description="Latest articles and news updates from Pademelon Fund."
->
+<BaseLayout title="Impact" description={description}>
   <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
-    News &amp; Updates
+    Impact
   </h1>
 
+  <p class="mt-3 text-lg leading-relaxed text-slate-600">
+    {description}
+  </p>
+
   {
-    newsPosts.length === 0 ? (
-      <p class="mt-6 text-slate-600">No news posted yet. Check back soon.</p>
+    impactPosts.length === 0 ? (
+      <p class="mt-6 text-slate-600">No impact stories posted yet. Check back soon.</p>
     ) : (
       // One column on phones, two from small tablets up.
       <ul class="mt-8 grid gap-6 sm:grid-cols-2">
-        {newsPosts.map((post) => {
+        {impactPosts.map((post) => {
           const photoCount = countGalleryImages(galleryFolderFor(post.data, post.id));
 
           return (
@@ -48,7 +53,7 @@ const newsPosts = (await getCollection('news')).sort(
 
                 <h2 class="mt-2 text-lg font-bold leading-snug text-slate-900">
                   <a
-                    href={withBase(`/news/${post.id}`)}
+                    href={withBase(`/impact/${post.id}`)}
                     class="transition hover:text-emerald-700"
                   >
                     {post.data.title}
@@ -61,7 +66,7 @@ const newsPosts = (await getCollection('news')).sort(
 
                 <div class="mt-4 flex items-center gap-3 text-xs font-medium text-emerald-700">
                   <a
-                    href={withBase(`/news/${post.id}`)}
+                    href={withBase(`/impact/${post.id}`)}
                     class="inline-flex min-h-11 items-center transition hover:text-emerald-800"
                   >
                     Read more &rarr;

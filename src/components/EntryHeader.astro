@@ -44,7 +44,9 @@ const {
     {title}
   </h1>
 
-  {description ? <p class:list={['mt-3 text-lg leading-relaxed text-slate-600', textClass]}>{description}</p> : null}
+  <!-- Deliberately not width-capped by `textClass`: headings stay in the narrow
+       column, but the standfirst spans the full container. -->
+  {description ? <p class="mt-3 text-lg leading-relaxed text-slate-600">{description}</p> : null}
 
   {heroImage ? (
     <img

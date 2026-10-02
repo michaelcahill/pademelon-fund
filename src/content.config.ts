@@ -37,8 +37,8 @@ const pages = defineCollection({
   }),
 });
 
-const news = defineCollection({
-  loader: glob({ base: 'src/content/news', pattern: '**/*.md' }),
+const impact = defineCollection({
+  loader: glob({ base: 'src/content/impact', pattern: '**/*.md' }),
   schema: z.object({
     title: z.string(),
     pubDate: z.coerce.date(),
@@ -64,4 +64,4 @@ const partners = defineCollection({
   }),
 });
 
-export const collections = { pages, news, partners };
+export const collections = { pages, impact, partners };
