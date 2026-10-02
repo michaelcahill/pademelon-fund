@@ -14,6 +14,10 @@ const base = isGithubPages ? '/pademelon-fund' : '';
 // with the base path in markdown content.
 // Astro automatically prefixes CSS/JS assets and astro:assets images, but not
 // regular markdown <img> src attributes.
+//
+// Note: `features: { rawHtml: true }` must be enabled below so that explicit
+// <img> tags written as raw HTML in markdown are parsed into real HAST element
+// nodes (instead of opaque `raw` nodes) and thus visited by this plugin.
 function prefixImagePaths() {
   return {
     name: 'prefix-image-paths',
@@ -43,6 +47,10 @@ export default defineConfig({
   },
   markdown: {
     processor: satteri({
+      // Parse raw HTML into structured HAST element nodes so the
+      // prefixImagePaths plugin can visit <img> tags regardless of whether
+      // they are written as markdown syntax or as raw HTML.
+      features: { rawHtml: true },
       hastPlugins: [prefixImagePaths()],
     }),
   },
