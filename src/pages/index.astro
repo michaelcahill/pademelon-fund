@@ -1,7 +1,6 @@
 ---
 import { getCollection, render } from 'astro:content';
 import HomeLayout from '../layouts/HomeLayout.astro';
-import { contactHref, newsHref } from '../lib/navigation';
 
 const home = await getCollection('pages', ({ id }) => id === 'home').then(
   (pages) => pages[0],
@@ -19,10 +18,6 @@ const { Content } = await render(home);
   description={home.data.description}
   heroImage={home.data.heroImage}
   heroAlt={home.data.heroAlt ?? home.data.title}
-  ctas={[
-    { href: newsHref, label: 'Read the news' },
-    { href: contactHref, label: 'Contact us' },
-  ]}
 >
   <div class="prose prose-slate prose-emerald max-w-none">
     <Content />
