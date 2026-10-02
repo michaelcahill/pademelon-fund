@@ -8,6 +8,13 @@
 @plugin "@tailwindcss/typography";
 
 @theme {
+  /* Wordmark green, sampled from the logo. `brand-dark` is a darker step of the
+   * same hue and saturation for hover states (6.7:1 on white vs 4.9:1 here).
+   * Generates utilities such as `text-brand` / `bg-brand`.
+   */
+  --color-brand: #5f775e;
+  --color-brand-dark: #4d614d;
+
   /* Collapse the menu below 52rem. The seven short nav labels plus the wordmark
    * need roughly 40rem, which leaves comfortable room at this width; if labels
    * get longer, raise this rather than letting the bar wrap.
