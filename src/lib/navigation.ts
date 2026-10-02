@@ -24,7 +24,6 @@ export const navItems: NavItem[] = [
   { href: withBase('/about'), label: 'About' },
   { href: withBase('/founders'), label: 'Founders' },
   { href: withBase('/partners'), label: 'Partners' },
-  { href: withBase('/co-funding'), label: 'Co-funding' },
   { href: impactHref, label: 'Impact' },
   { href: contactHref, label: 'Contact' },
 ];
