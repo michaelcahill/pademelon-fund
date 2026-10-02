@@ -70,7 +70,7 @@ const { title, description, heroImage, heroAlt, ctas = [] } = Astro.props;
             alt={heroAlt ?? ''}
             // No fixed aspect ratio: let the image (e.g. a portrait logo) keep
             // its natural shape instead of being cropped to a landscape box.
-            class="w-full rounded-xl object-contain shadow-sm sm:rounded-2xl"
+            class="w-full rounded-xl object-contain sm:rounded-2xl"
             decoding="async"
             fetchpriority="high"
           />
