@@ -68,7 +68,9 @@ const { title, description, heroImage, heroAlt, ctas = [] } = Astro.props;
           <img
             src={withBase(heroImage)}
             alt={heroAlt ?? ''}
-            class="aspect-[3/2] w-full rounded-xl object-cover shadow-sm sm:rounded-2xl"
+            // No fixed aspect ratio: let the image (e.g. a portrait logo) keep
+            // its natural shape instead of being cropped to a landscape box.
+            class="w-full rounded-xl object-contain shadow-sm sm:rounded-2xl"
             decoding="async"
             fetchpriority="high"
           />
