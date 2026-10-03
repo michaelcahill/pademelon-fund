@@ -1,0 +1,119 @@
+{
+  "version": "1.2",
+  "media": {
+    "default_library": "repo_media",
+    "libraries": [
+      {
+        "key": "repo_media",
+        "label": "Repository media",
+        "references": {
+          "write": {
+            "mode": "root_relative",
+            "base_path": "/"
+          },
+          "allow_default_library_fallback": true
+        },
+        "limits": {
+          "max_file_size_mb": 10
+        },
+        "driver": "git",
+        "storage": {
+          "root_path": "public"
+        }
+      }
+    ]
+  },
+  "default_branch": "main",
+  "frontmatter_format": "yaml",
+  "sitemap_url": "https://pademelon.fund/sitemap.xml",
+  "publishing_mode": "editorial_workflow",
+  "collections": [
+    {
+      "name": "pages",
+      "git_path": "/src/content/pages/",
+      "file_extension": ".md",
+      "filename_pattern": "",
+      "collection_type": "flat",
+      "frontmatter_schema": [
+        {
+          "name": "title",
+          "type": "title",
+          "label": "Title",
+          "required": false
+        },
+        {
+          "name": "description",
+          "type": "richtext",
+          "label": "Description",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "partners",
+      "git_path": "/src/content/partners/",
+      "file_extension": ".md",
+      "filename_pattern": "",
+      "collection_type": "flat",
+      "frontmatter_schema": [
+        {
+          "name": "name",
+          "type": "title",
+          "label": "Name",
+          "required": false
+        },
+        {
+          "name": "description",
+          "type": "richtext",
+          "label": "Description",
+          "required": false
+        },
+        {
+          "name": "logo",
+          "type": "image",
+          "label": "Logo",
+          "required": false
+        },
+        {
+          "name": "link",
+          "type": "url",
+          "label": "Link",
+          "required": false
+        },
+        {
+          "name": "order",
+          "type": "number",
+          "label": "Order",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "impact",
+      "git_path": "/src/content/impact/",
+      "file_extension": ".md",
+      "filename_pattern": "",
+      "collection_type": "flat",
+      "frontmatter_schema": [
+        {
+          "name": "title",
+          "type": "title",
+          "label": "Title",
+          "required": false
+        },
+        {
+          "name": "pubDate",
+          "type": "datetime",
+          "label": "Pub Date",
+          "required": false
+        },
+        {
+          "name": "description",
+          "type": "richtext",
+          "label": "Description",
+          "required": false
+        }
+      ]
+    }
+  ]
+}
