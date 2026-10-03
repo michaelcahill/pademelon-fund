@@ -8,7 +8,7 @@ import tailwindcss from '@tailwindcss/vite';
 // - GitHub Pages: base is /pademelon-fund, site serves at /pademelon-fund/
 // - Custom domain: base is empty (just remove the env var), site serves at /
 const isGithubPages = process.env.GITHUB_PAGES === 'true';
-const base = isGithubPages ? '/pademelon-fund' : '';
+const base = '';
 
 // HAST plugin for the Sätteri Markdown processor to prefix image src paths
 // with the base path in markdown content.
