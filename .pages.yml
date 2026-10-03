@@ -4,7 +4,8 @@ media:
   output: /images
 
 content:
-  # Standalone pages (created manually as needed)
+  # Standalone pages (created manually as needed). Filename becomes the URL:
+  # about.md -> /about
   - name: pages
     label: Pages
     type: collection
@@ -54,11 +55,12 @@ content:
         label: Page Content
         type: rich-text
 
-  # News posts (blog-like)
-  - name: news
-    label: News
+  # Impact posts (blog-like), listed at /impact. Filename becomes the URL:
+  # 2026-09-25-spring-country.md -> /impact/2026-09-25-spring-country
+  - name: impact
+    label: Impact
     type: collection
-    path: src/content/news
+    path: src/content/impact
     fields:
       - name: title
         label: Article Title
@@ -77,6 +79,7 @@ content:
         type: string
         required: true
 
+      # Shown at the top of the post.
       - name: image
         label: Featured Image
         type: image
