@@ -7,15 +7,14 @@ import sitemap from '@astrojs/sitemap';
 import { satteri } from '@astrojs/markdown-satteri';
 import tailwindcss from '@tailwindcss/vite';
 
-// Use GITHUB_PAGES env var to conditionally set the base path.
-// - Local dev: base is empty, site serves at /
-// - GitHub Pages: base is /pademelon-fund, site serves at /pademelon-fund/
-// - Custom domain: base is empty (just remove the env var), site serves at /
+// Base path. Served from a custom domain at the root, so this stays empty.
+// Set it (e.g. '/pademelon-fund') only if the site ever moves under a
+// sub-directory, such as GitHub Pages without a custom domain.
 const base = '';
 
 // Canonical origin. Used for <link rel="canonical">, og:url and /sitemap.xml.
-// Override with SITE_URL if the site is ever served from another host (e.g.
-// https://michaelcahill.github.io/pademelon-fund while on GitHub Pages).
+// Override with SITE_URL if the site is ever served from another host (e.g. a
+// GitHub Pages preview at https://michaelcahill.github.io/pademelon-fund).
 const site = process.env.SITE_URL ?? 'https://pademelon.fund';
 
 // HAST plugin for the Sätteri Markdown processor to prefix image src paths

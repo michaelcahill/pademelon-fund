@@ -24,10 +24,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # The site is served from the custom domain (pademelon.fund), so no base
+      # path and no extra env is needed here. To preview from another origin,
+      # set SITE_URL (see astro.config.mjs).
       - name: Build site
         run: npm run build
-        env:
-          GITHUB_PAGES: true
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5
