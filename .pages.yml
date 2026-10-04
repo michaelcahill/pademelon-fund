@@ -1,7 +1,32 @@
-# Media uploads destination
+# Media upload destinations.
+#
+# Two named sources: images go to public/images; downloadable files (PDFs,
+# spreadsheets, decks, ZIPs) go to public/documents. Files are served verbatim
+# from their `output` path, so an uploaded `grant-rules.pdf` is reachable at
+# /documents/grant-rules.pdf and can be linked from any page or impact body:
+#
+#   [Grant rules](/documents/grant-rules.pdf)
+#
+# The bare name works too — `[Grant rules](grant-rules.pdf)` — as does
+# `documents/grant-rules.pdf`; astro.config.mjs rewrites both to the canonical
+# /documents/… URL when the file exists (see prefixContentPaths).
+#
+# `rename: safe` on documents slugifies uploads so URLs stay link-friendly;
+# image uploads keep their original names, as they always have.
 media:
-  input: public/images
-  output: /images
+  - name: images
+    label: Images
+    input: public/images
+    output: /images
+    categories: [image]
+
+  - name: documents
+    label: Documents (PDF, CSV, ZIP…)
+    input: public/documents
+    output: /documents
+    # document = pdf, doc(x), xls(x), csv, ppt(x), txt, rtf, odt, ods…
+    categories: [document, spreadsheet]
+    rename: safe
 
 content:
   # Standalone pages (created manually as needed). Filename becomes the URL:
@@ -25,6 +50,8 @@ content:
         label: Hero Image (upload, or path such as /images/about/team.jpg)
         type: image
         required: false
+        options:
+          media: images
 
       - name: heroAlt
         label: Hero Image Alt Text
@@ -51,9 +78,13 @@ content:
         type: string
         required: false
 
+      # Page body. Link an uploaded document with
+      # [Annual report](/documents/annual-report-2026.pdf)
       - name: body
         label: Page Content
         type: rich-text
+        options:
+          media: images
 
   # Impact posts (blog-like), listed at /impact. Filename becomes the URL:
   # 2026-09-25-spring-country.md -> /impact/2026-09-25-spring-country
@@ -84,6 +115,8 @@ content:
         label: Featured Image
         type: image
         required: false
+        options:
+          media: images
 
       - name: imageAlt
         label: Featured Image Alt Text
@@ -109,9 +142,13 @@ content:
         type: string
         required: false
 
+      # Post body. Link an uploaded document with
+      # [Annual report](/documents/annual-report-2026.pdf)
       - name: body
         label: Content
         type: rich-text
+        options:
+          media: images
 
   # Partner organisations (listed on /partners)
   - name: partners
@@ -133,6 +170,8 @@ content:
         label: Logo (upload, or path such as /images/partners/nic.png)
         type: image
         required: false
+        options:
+          media: images
 
       - name: link
         label: Website (optional)

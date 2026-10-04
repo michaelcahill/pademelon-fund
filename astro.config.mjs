@@ -17,28 +17,79 @@ const base = '';
 // GitHub Pages preview at https://michaelcahill.github.io/pademelon-fund).
 const site = process.env.SITE_URL ?? 'https://pademelon.fund';
 
-// HAST plugin for the Sätteri Markdown processor to prefix image src paths
-// with the base path in markdown content.
-// Astro automatically prefixes CSS/JS assets and astro:assets images, but not
-// regular markdown <img> src attributes.
+// Static uploads live in `public/documents` and are served from
+// `/documents/…` — see the `documents` media source in .pages.yml.
+const DOCUMENTS_ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), 'public', 'documents');
+const DOCUMENTS_URL = '/documents';
+
+/** Any file accepted by the Documents upload source. */
+const DOCUMENT_EXT = /\.(pdf|docx?|xlsx?|csv|pptx?|odt|ods|rtf|txt|zip|gz|epub|ics)$/i;
+
+/**
+ * Resolves a path written in content to a real file inside `public/documents`,
+ * or returns `undefined`. Accepts `report.pdf`, `documents/report.pdf`,
+ * `./public/documents/report.pdf` and sub-folders; `..` segments never escape
+ * the documents folder.
+ */
+function findDocument(reference) {
+  const relative = reference
+    .replace(/^\.\//, '')
+    .replace(/^(?:public\/)?documents\//, '')
+    .replace(/^\/+/, '');
+  if (!relative) return undefined;
+
+  const parts = relative.split('/');
+  if (parts.some((part) => part === '' || part === '..')) return undefined;
+
+  const absolute = path.join(DOCUMENTS_ROOT, ...parts);
+  if (absolute !== DOCUMENTS_ROOT && !absolute.startsWith(DOCUMENTS_ROOT + path.sep)) {
+    return undefined;
+  }
+  if (!fs.existsSync(absolute) || !fs.statSync(absolute).isFile()) return undefined;
+
+  // Forward-slash, repo-relative path used to build the public URL.
+  return absolute.slice(DOCUMENTS_ROOT.length + 1).split(path.sep).join('/');
+}
+
+// HAST plugin for the Sätteri Markdown processor. Two jobs on content:
+//
+// 1. Prefixes root-relative `src`/`href` values with the base path. Astro
+//    prefixes its own assets and astro:assets images automatically, but not the
+//    URLs you write in markdown.
+// 2. Lets an uploaded file be referenced by name alone: `[Rules](rules.pdf)`,
+//    `[Rules](documents/rules.pdf)` and `[Rules](public/documents/rules.pdf)`
+//    all become `/documents/rules.pdf` (or the base-prefixed equivalent) when
+//    that file exists. Plain relative links that are not uploads — `../about`,
+//    `sibling.html` — and absolute/external URLs are left exactly as written.
 //
 // Note: `features: { rawHtml: true }` must be enabled below so that explicit
 // <img> tags written as raw HTML in markdown are parsed into real HAST element
 // nodes (instead of opaque `raw` nodes) and thus visited by this plugin.
-function prefixImagePaths() {
+function prefixContentPaths() {
   return {
-    name: 'prefix-image-paths',
+    name: 'prefix-content-paths',
     element: {
-      filter: ['img'],
+      filter: ['img', 'source', 'a'],
       visit(node, ctx) {
-        const src = node.properties?.src;
-        if (
-          base &&
-          typeof src === 'string' &&
-          !src.startsWith(base) &&
-          !src.startsWith('http')
-        ) {
-          ctx.setProperty(node, 'src', base + src);
+        const key = node.tagName === 'a' ? 'href' : 'src';
+        const value = node.properties?.[key];
+        if (typeof value !== 'string' || value === '') return;
+
+        // External, protocol-relative, mail/tel, in-page anchors: untouched.
+        if (/^(https?:)?\/\//i.test(value) || /^(mailto:|tel:|#|data:)/i.test(value)) return;
+
+        // (2) Upload shorthand → canonical /documents/… URL.
+        if (!value.startsWith('/') && DOCUMENT_EXT.test(value)) {
+          const found = findDocument(value);
+          if (found) {
+            ctx.setProperty(node, key, `${base}${DOCUMENTS_URL}/${encodeURI(found)}`);
+            return;
+          }
+        }
+
+        // (1) Base-path prefixing for site-absolute paths.
+        if (base && !value.startsWith(base)) {
+          ctx.setProperty(node, key, base + value);
         }
       },
     },
@@ -82,10 +133,10 @@ export default defineConfig({
   markdown: {
     processor: satteri({
       // Parse raw HTML into structured HAST element nodes so the
-      // prefixImagePaths plugin can visit <img> tags regardless of whether
-      // they are written as markdown syntax or as raw HTML.
+      // prefixContentPaths plugin can visit <img> and <a> tags regardless of
+      // whether they are written as markdown syntax or as raw HTML.
       features: { rawHtml: true },
-      hastPlugins: [prefixImagePaths()],
+      hastPlugins: [prefixContentPaths()],
     }),
   },
 });

@@ -15,7 +15,8 @@ npm run dev      # start local dev server at http://localhost:4321
 ```text
 /
 ├── public/
-│   └── images/          # PagesCMS media uploads + gallery folders
+│   ├── images/          # PagesCMS image uploads + gallery folders
+│   └── documents/       # PagesCMS document uploads (PDFs, CSVs, decks…)
 ├── src/
 │   ├── components/
 │   │   ├── EntryHeader.astro   # Title / standfirst / date / hero image
@@ -102,6 +103,45 @@ lightbox: swipe or arrow keys to move between images of the same gallery, Escape
 or a click outside to close. The lightbox script (~15KB gzipped) is only loaded
 on pages that render a gallery; its stylesheet also ships with any page built
 from `src/pages/[...slug].astro`.
+
+## Documents and downloads
+
+Static files — PDFs, spreadsheets, slide decks, ZIPs — are uploaded to
+`public/documents/` and served verbatim at `/documents/…`. There is nothing to
+register: PagesCMS writes the file into the folder (the **Documents** media
+source in `.pages.yml`) and Astro copies it into `dist/` on build.
+
+Link one from any page or impact body:
+
+```markdown
+[Annual report 2026](/documents/annual-report-2026.pdf)
+```
+
+All of these resolve to the same file, which keeps copy-pasted paths and
+filename-only links working:
+
+| Written in markdown                              | Rendered href                          |
+| :----------------------------------------------- | :------------------------------------- |
+| `/documents/annual-report-2026.pdf`              | `/documents/annual-report-2026.pdf`    |
+| `annual-report-2026.pdf`                         | `/documents/annual-report-2026.pdf`    |
+| `documents/annual-report-2026.pdf`               | `/documents/annual-report-2026.pdf`    |
+| `public/documents/annual-report-2026.pdf`        | `/documents/annual-report-2026.pdf`    |
+| `grant-rounds/rules.pdf` (sub-folder)            | `/documents/grant-rounds/rules.pdf`    |
+
+The rewrite happens in `prefixContentPaths()` in `astro.config.mjs`, which also
+adds the base path to site-absolute `src`/`href` values in markdown (Astro does
+not touch those itself). Rules worth knowing:
+
+- The shorthand only applies to known document extensions and only when the
+  file actually exists — a typo stays a broken relative link rather than being
+  silently rewritten, so double-check new links in the preview.
+- Absolute (`/…`), external (`https://…`), `mailto:`/`tel:` and `#anchor` links
+  are left exactly as written.
+- Uploads are renamed to URL-safe names by PagesCMS (`rename: safe`), so spaces
+  and accents never end up in a link.
+- Files are served as-is, like everything in `public/`: no compression, and the
+  browser shows PDFs inline. A link opens the file; hold Option/right-click to
+  save it.
 
 ## Responsive behaviour
 
