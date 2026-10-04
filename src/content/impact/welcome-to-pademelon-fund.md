@@ -1,6 +1,6 @@
 ---
 title: Welcome to Pademelon Fund
-pubDate: 2024-00-12
+pubDate: 2022-00-01
 description: We're excited to announce the launch of Pademelon Fund, supporting
   grassroots action for nature, First Nations and climate across Australia.
 image: /images/IMG_pademelon.jpg
