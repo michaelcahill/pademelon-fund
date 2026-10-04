@@ -40,13 +40,32 @@ function titleFromFilename(file: string): string {
   return stem.charAt(0).toUpperCase() + stem.slice(1);
 }
 
+/** Parse captions from frontmatter.
+ * Expected format (one per line): filename.jpg: Caption text.
+ * Returns a map filename → caption.
+ */
+function parseCaptions(captions?: string | null): Record<string, string> {
+  const map: Record<string, string> = {};
+  if (!captions) return map;
+  for (const line of captions.split(/\r?\n/)) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const idx = trimmed.indexOf(':');
+    if (idx <= 0) continue;
+    const file = trimmed.slice(0, idx).trim();
+    const caption = trimmed.slice(idx + 1).trim();
+    if (file && caption) map[file] = caption;
+  }
+  return map;
+}
+
 /**
  * Lists the images in a gallery folder, in filename order.
  *
  * Returns an empty array (never throws) when the folder is missing, so a page
  * can be published before its images are uploaded.
  */
-export function getGalleryImages(folder?: string | null): GalleryImage[] {
+export function getGalleryImages(folder?: string | null, captions?: string | null): GalleryImage[] {
   if (!folder) return [];
 
   const dir = path.resolve(IMAGES_DIR, folder);
@@ -55,17 +74,22 @@ export function getGalleryImages(folder?: string | null): GalleryImage[] {
   if (dir !== IMAGES_DIR && !dir.startsWith(IMAGES_DIR + path.sep)) return [];
   if (!existsSync(dir) || !statSync(dir).isDirectory()) return [];
 
+  const captionMap = parseCaptions(captions);
+
   return readdirSync(dir, { withFileTypes: true })
     .filter((entry) => entry.isFile() && !entry.name.startsWith('.'))
     .map((entry) => entry.name)
     .filter((name) => IMAGE_EXT.test(name))
     // Natural sort so `2.jpg` sorts before `10.jpg`.
     .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }))
-    .map((name) => ({
-      src: withBase(path.posix.join('/images', folder.replace(/\\/g, '/'), name)),
-      alt: titleFromFilename(name),
-      file: name,
-    }));
+    .map((name) => {
+      const alt = captionMap[name] ?? titleFromFilename(name);
+      return {
+        src: withBase(path.posix.join('/images', folder.replace(/\\/g, '/'), name)),
+        alt,
+        file: name,
+      };
+    });
 }
 
 /** Convenience wrapper for listings that only need the count. */

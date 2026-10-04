@@ -24,7 +24,7 @@ const { Content } = await render(page);
 
 // A page becomes a gallery when its image folder has images in it.
 const folder = galleryFolderFor(page.data, page.id);
-const images = getGalleryImages(folder);
+const images = getGalleryImages(folder, page.data.captions);
 const layout = pickLayout(page.data.layout, images.length);
 ---
 

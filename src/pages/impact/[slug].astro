@@ -23,7 +23,7 @@ const { Content } = await render(post);
 
 // A post becomes a gallery when its image folder has images in it.
 const folder = galleryFolderFor(post.data, post.id);
-const images = getGalleryImages(folder);
+const images = getGalleryImages(folder, post.data.captions);
 const layout = pickLayout(post.data.layout, images.length);
 ---
 

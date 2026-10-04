@@ -142,6 +142,14 @@ content:
         type: string
         required: false
 
+      # Optional per-image captions. One line per image, format:
+      # filename.jpg: Caption text shown in the lightbox and as alt text.
+      # Lines are parsed in Astro; empty lines are ignored.
+      - name: captions
+        label: Image Captions (filename: caption)
+        type: text
+        required: false
+
       # Post body. Link an uploaded document with
       # [Annual report](/documents/annual-report-2026.pdf)
       - name: body

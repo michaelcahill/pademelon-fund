@@ -23,6 +23,12 @@ const galleryFields = {
     .string()
     .default('3/2')
     .describe('CSS aspect-ratio for gallery tiles, e.g. 3/2, 1/1, 16/9.'),
+  captions: z
+    .string()
+    .optional()
+    .describe(
+      'One line per image: filename.jpg: Caption. Parsed by lib/galleries.',
+    ),
 };
 
 const pages = defineCollection({
