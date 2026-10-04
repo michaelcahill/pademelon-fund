@@ -15,7 +15,7 @@
   --color-brand: #5f775e;
   --color-brand-dark: #4d614d;
 
-  /* Collapse the menu below 52rem. The seven short nav labels plus the wordmark
+  /* Collapse the menu below 40rem. The seven short nav labels plus the wordmark
    * need roughly 40rem, which leaves comfortable room at this width; if labels
    * get longer, raise this rather than letting the bar wrap.
    *
@@ -23,7 +23,8 @@
    * below has to be kept in sync because custom properties can't be used
    * inside a media query.
    */
-  --breakpoint-nav: 52rem;
+
+  --breakpoint-nav: 40rem;
 }
 
 html {
@@ -129,7 +130,7 @@ html.js .nav-panel:not([data-open="true"]) {
   @apply block px-5 py-3 text-base font-medium text-slate-700 transition hover:bg-slate-50 hover:text-emerald-700;
 }
 
-@media (width >= 52rem) {
+@media (width >= 40rem) {
   .nav-bar {
     display: flex;
   }
