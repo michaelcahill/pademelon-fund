@@ -155,7 +155,7 @@ content:
       # filename.jpg: Caption text shown in the lightbox and as alt text.
       # Lines are parsed in Astro; empty lines are ignored.
       - name: captions
-        label: Image Captions (filename: caption)
+        label: "Image Captions (filename: caption)"
         type: text
         required: false
 
