@@ -23,24 +23,30 @@ npm run dev      # start local dev server at http://localhost:4321
 │   │   ├── Footer.astro
 │   │   ├── GalleryGrid.astro   # Responsive grid of gallery tiles
 │   │   ├── Lightbox.astro      # glightbox setup (tap-to-zoom)
-│   │   └── Nav.astro           # Header nav, collapses on narrow screens
+│   │   ├── Nav.astro           # Header nav, collapses on narrow screens
+│   │   └── PeopleGrid.astro    # Cards for the people collection
 │   ├── content/
-│   │   ├── pages/       # Standalone pages (About, etc.)
-│   │   └── news/        # Blog-style news posts
+│   │   ├── pages/       # Standalone pages (About, People, etc.)
+│   │   ├── people/      # One file per person (card bio)
+│   │   ├── partners/    # Partner organisations
+│   │   └── impact/      # Blog-style impact posts
 │   ├── layouts/
 │   │   ├── BaseLayout.astro    # <html> shell, nav, footer (uniform width)
 │   │   ├── HomeLayout.astro    # Hero + CTA buttons + page sections
 │   │   ├── PageLayout.astro    # Title + prose article
 │   │   └── GalleryLayout.astro # Grid layout (pages and news items)
 │   ├── lib/
+│   │   ├── cards.ts            # Splits a page at its `<!-- cards -->` marker
 │   │   ├── galleries.ts        # Lists images in a gallery folder
 │   │   ├── layouts.ts          # Chooses a layout for an entry
 │   │   ├── navigation.ts       # Shared nav items + active-link logic
+│   │   ├── people.ts           # People listing + portrait lookup
 │   │   ├── paths.ts            # Base-path helper for GitHub Pages
-│   │   └── shell.ts            # Single page-width constant (nav + main + footer)
+│   │   └── shell.ts            # Shared page-width + prose constants
 │   ├── pages/
 │   │   ├── index.astro          # Home page (HomeLayout)
 │   │   ├── [...slug].astro      # Pages collection (page / home / gallery)
+│   │   ├── founders.astro       # Redirect stub: /founders moved to /people
 │   │   └── news/
 │   │       ├── [slug].astro     # Individual news post (page or gallery)
 │   │       └── index.astro      # News listing
@@ -165,15 +171,60 @@ was removed; anything custom belongs in `global.css` (`@theme`, `@utility`).
 
 ## Adding Content
 
-Content is managed through [PagesCMS](https://pagescms.dev). The site uses two
+Content is managed through [PagesCMS](https://pagescms.dev). The site uses four
 content collections:
 
-- **pages** — standalone pages like "Impact" (rendered at `/<slug>`)
-- **news** — blog-style posts (rendered at `/news/<slug>`)
+- **pages** — standalone pages like "About" and "People" (rendered at `/<slug>`)
+- **people** — one file per person; their markdown body becomes a card on
+  `/people` (see below)
+- **partners** — organisations listed on `/partners`
+- **impact** — blog-style posts (rendered at `/impact/<slug>`)
 
-To add content locally, create `.md` files in `src/content/pages/` or
-`src/content/news/` with frontmatter matching the collection schema (see
-`src/content.config.ts`).
+To add content locally, create `.md` files in the collection's folder with
+frontmatter matching the schema in `src/content.config.ts`.
+
+## People cards
+
+`/people` is still an ordinary markdown page: `cards: people` in its frontmatter
+asks for one card per file in `src/content/people/`, and a marker on a line of
+its own says **where** they go — so text can sit above and below them:
+
+```markdown
+Intro paragraph, shown above the cards.
+
+<!-- cards -->
+
+Closing paragraph, shown below the cards.
+```
+
+The marker is removed from the rendered page; only the first one is used. Write
+`{{cards}}` instead if your editor strips HTML comments. With no marker at all the
+cards follow the page text, as they did before placement existed.
+
+A new person is a new markdown file — no component work, no HTML:
+
+```markdown
+---
+name: Jane Doe
+role: Advisor
+order: 3
+---
+Jane Doe …bio paragraph…
+```
+
+The portrait follows the gallery convention: drop
+`public/images/people/jane-doe.jpg` (matching the filename) and it is picked up
+automatically, or set `image:` explicitly. Bios are plain prose — paragraphs,
+lists and links work; keep headings out, as the card supplies the name.
+
+Because a portrait folder exists, `/people` sets `layout: page` so the images do
+not turn the page into a gallery (see `pickLayout()`).
+
+Mechanics: `splitAtCards()` in `src/lib/cards.ts` splits the page's rendered HTML
+at the marker. The first half renders in `PageLayout`'s prose block, the grid goes
+in its `after` slot — outside `.prose`, so the typography plugin cannot put its 2em
+image margins around each portrait — and the second half follows in a wrapper using
+the same `PROSE_CLASS` constant, which is why the two halves look identical.
 
 ## Deployment
 

@@ -126,7 +126,12 @@ function plainSitemapFile() {
 export default defineConfig({
   base,
   site,
-  integrations: [sitemap(), plainSitemapFile()],
+  integrations: [
+    // `/founders` is a redirect stub for the renamed People page — keep it out
+    // of the sitemap so only /people is advertised.
+    sitemap({ filter: (page) => !page.replace(/\/+$/, '').endsWith('/founders') }),
+    plainSitemapFile(),
+  ],
   vite: {
     plugins: [tailwindcss()]
   },

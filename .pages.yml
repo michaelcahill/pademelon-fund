@@ -78,6 +78,15 @@ content:
         type: string
         required: false
 
+      # Embeds a generated block in the page: `people` renders one card per file
+      # in src/content/people. Put `<!-- cards -->` on a line of its own where the
+      # cards should appear (text above and below them is kept); leave it out and
+      # they follow the page text. Leave the field empty for a plain prose page.
+      - name: cards
+        label: "Cards (people, or empty)"
+        type: string
+        required: false
+
       # Page body. Link an uploaded document with
       # [Annual report](/documents/annual-report-2026.pdf)
       - name: body
@@ -154,6 +163,59 @@ content:
       # [Annual report](/documents/annual-report-2026.pdf)
       - name: body
         label: Content
+        type: rich-text
+        options:
+          media: images
+
+  # People shown as cards on /people. Filename becomes the card's slug and the
+  # name of its portrait folder: rachel-honnery.md -> public/images/people/
+  # rachel-honnery.jpg. The body is the bio — plain prose, no HTML needed.
+  - name: people
+    label: People
+    type: collection
+    path: src/content/people
+    fields:
+      - name: name
+        label: Name
+        type: string
+        required: true
+
+      - name: role
+        label: Role (short line under the name)
+        type: string
+        required: false
+
+      # Leave blank to use public/images/people/<filename>.jpg (or .png/.webp).
+      - name: image
+        label: Portrait (upload, or path such as /images/people/jane-doe.png)
+        type: image
+        required: false
+        options:
+          media: images
+
+      - name: imageAlt
+        label: Portrait Alt Text
+        type: string
+        required: false
+
+      - name: link
+        label: Profile Link (optional)
+        type: string
+        required: false
+
+      - name: linkLabel
+        label: Profile Link Text (default "More")
+        type: string
+        required: false
+
+      - name: order
+        label: Sort Order (lower first, default 0)
+        type: number
+        required: false
+
+      # Bio shown inside the card.
+      - name: body
+        label: Bio
         type: rich-text
         options:
           media: images

@@ -10,6 +10,7 @@ function withBase(pathname: string): string {
 }
 
 export const homeHref = withBase('/');
+export const peopleHref = withBase('/people');
 export const impactHref = withBase('/impact');
 export const contactHref = withBase('/contact');
 
@@ -22,7 +23,7 @@ export const contactHref = withBase('/contact');
  */
 export const navItems: NavItem[] = [
   { href: withBase('/about'), label: 'About' },
-  { href: withBase('/founders'), label: 'Founders' },
+  { href: peopleHref, label: 'People' },
   { href: withBase('/partners'), label: 'Partners' },
   { href: impactHref, label: 'Impact' },
   { href: contactHref, label: 'Contact' },

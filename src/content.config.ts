@@ -39,6 +39,14 @@ const pages = defineCollection({
     /** Site-absolute path, e.g. /images/about/team.jpg */
     heroImage: z.string().optional(),
     heroAlt: z.string().optional(),
+    /**
+     * Embeds a generated block in the page, e.g. `cards: people` for the cards
+     * built from src/content/people (page layout only). Where it lands is up to
+     * the page: put a `<!-- cards -->` marker on its own line wherever the block
+     * should appear, with prose above and below it. No marker means it follows
+     * the page text. See src/lib/cards.ts.
+     */
+    cards: z.enum(['people']).optional(),
     ...galleryFields,
   }),
 });
@@ -56,6 +64,30 @@ const impact = defineCollection({
   }),
 });
 
+/**
+ * People (and the occasional non-human) shown as cards on the People page.
+ * The markdown body is the bio — plain prose, rendered inside the card.
+ */
+const people = defineCollection({
+  loader: glob({ base: 'src/content/people', pattern: '**/*.md' }),
+  schema: z.object({
+    name: z.string(),
+    /** Short line under the name, e.g. "Co-founder". */
+    role: z.string().optional(),
+    /**
+     * Site-absolute portrait path, e.g. /images/people/rachel-honnery.png.
+     * Omit to use `public/images/people/<slug>.<ext>` (any common extension).
+     */
+    image: z.string().optional(),
+    imageAlt: z.string().optional(),
+    /** Optional URL shown as a link on the card. */
+    link: z.string().optional(),
+    linkLabel: z.string().optional(),
+    /** Sort order (lower first); defaults to 0, then by name. */
+    order: z.number().optional(),
+  }),
+});
+
 const partners = defineCollection({
   loader: glob({ base: 'src/content/partners', pattern: '**/*.md' }),
   schema: z.object({
@@ -70,4 +102,4 @@ const partners = defineCollection({
   }),
 });
 
-export const collections = { pages, impact, partners };
+export const collections = { pages, impact, people, partners };

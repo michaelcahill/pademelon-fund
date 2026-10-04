@@ -1,6 +1,7 @@
 ---
 import BaseLayout from './BaseLayout.astro';
 import EntryHeader from '../components/EntryHeader.astro';
+import { PROSE_CLASS } from '../lib/shell';
 
 interface Props {
   title: string;
@@ -36,7 +37,7 @@ const {
     />
 
     <!-- The typography plugin handles headings, lists, quotes and media. -->
-    <div class="prose prose-slate prose-emerald mt-8 max-w-none">
+    <div class:list={[PROSE_CLASS, 'mt-8']}>
       <slot />
     </div>
 

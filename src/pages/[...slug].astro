@@ -3,8 +3,11 @@ import { getCollection, render, type CollectionEntry } from 'astro:content';
 import GalleryLayout from '../layouts/GalleryLayout.astro';
 import HomeLayout from '../layouts/HomeLayout.astro';
 import PageLayout from '../layouts/PageLayout.astro';
+import PeopleGrid from '../components/PeopleGrid.astro';
+import { splitAtCards } from '../lib/cards';
 import { galleryFolderFor, getGalleryImages } from '../lib/galleries';
 import { pickLayout } from '../lib/layouts';
+import { PROSE_CLASS } from '../lib/shell';
 
 export async function getStaticPaths() {
   // 'home' is rendered by src/pages/index.astro, not as a slug route.
@@ -26,6 +29,12 @@ const { Content } = await render(page);
 const folder = galleryFolderFor(page.data, page.id);
 const images = getGalleryImages(folder, page.data.captions);
 const layout = pickLayout(page.data.layout, images.length);
+
+// `cards: people` splits this page around its `<!-- cards -->` marker. The two
+// halves are the same HTML `<Content />` would render (RenderedContent holds it),
+// which lets the grid sit between them.
+const cards = page.data.cards;
+const split = cards && page.rendered ? splitAtCards(page.rendered.html) : undefined;
 ---
 
 {
@@ -37,7 +46,7 @@ const layout = pickLayout(page.data.layout, images.length);
       group={folder}
       aspect={page.data.galleryAspect}
     >
-      <div slot="intro" class="prose prose-slate prose-emerald max-w-none">
+      <div slot="intro" class={PROSE_CLASS}>
         <Content />
       </div>
     </GalleryLayout>
@@ -48,7 +57,7 @@ const layout = pickLayout(page.data.layout, images.length);
       heroImage={page.data.heroImage}
       heroAlt={page.data.heroAlt ?? page.data.title}
     >
-      <div class="prose prose-slate prose-emerald max-w-none">
+      <div class={PROSE_CLASS}>
         <Content />
       </div>
     </HomeLayout>
@@ -59,7 +68,21 @@ const layout = pickLayout(page.data.layout, images.length);
       heroImage={page.data.heroImage}
       heroAlt={page.data.heroAlt}
     >
-      <Content />
+      {/* Text above the marker stays in PageLayout's own prose block. */}
+      {split ? <Fragment set:html={split.before} /> : <Content />}
+
+      <!-- The grid goes in the `after` slot, outside PageLayout's `.prose`
+           wrapper, so the typography plugin cannot add its 2em image margins
+           around each portrait; any text written below the marker follows it in
+           matching prose styling. Without a marker the cards simply come last. -->
+      {cards ? (
+        <div slot="after">
+          <PeopleGrid />
+          {split?.after ? (
+            <div class:list={[PROSE_CLASS, 'mt-10']} set:html={split.after} />
+          ) : null}
+        </div>
+      ) : null}
     </PageLayout>
   )
 }

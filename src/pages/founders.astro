@@ -1,0 +1,25 @@
+---
+// `/founders` was renamed to `/people`. A static build can't issue a 301, so
+// this stub forwards old links and bookmarks. Excluded from the sitemap in
+// astro.config.mjs.
+import { peopleHref } from '../lib/navigation';
+import { siteName } from '../lib/site';
+
+const canonical = new URL(peopleHref, Astro.site ?? 'https://pademelon.fund').toString();
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>{`People | ${siteName}`}</title>
+    <meta http-equiv="refresh" content={`0;url=${peopleHref}`} />
+    <link rel="canonical" href={canonical} />
+    <meta name="robots" content="noindex" />
+  </head>
+  <body>
+    <p>
+      This page has moved to <a href={peopleHref}>People</a>.
+    </p>
+  </body>
+</html>
