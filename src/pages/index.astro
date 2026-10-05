@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import HomeLayout from '../layouts/HomeLayout.astro';
+import { injectSnippets } from '../lib/snippets';
 
 const home = await getCollection('pages', ({ id }) => id === 'home').then(
   (pages) => pages[0],
@@ -10,7 +11,10 @@ if (!home) {
   throw new Error('Missing required content page: src/content/pages/home.md');
 }
 
-const { Content } = await render(home);
+await render(home);
+
+// `{{snippet-name}}` placeholders become verbatim HTML (src/lib/snippets.ts).
+const bodyHtml = await injectSnippets(home.rendered?.html ?? '');
 ---
 
 <HomeLayout
@@ -19,7 +23,5 @@ const { Content } = await render(home);
   heroImage={home.data.heroImage}
   heroAlt={home.data.heroAlt ?? home.data.title}
 >
-  <div class="prose prose-slate prose-emerald max-w-none">
-    <Content />
-  </div>
+  <div class="prose prose-slate prose-emerald max-w-none" set:html={bodyHtml} />
 </HomeLayout>

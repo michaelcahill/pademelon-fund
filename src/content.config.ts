@@ -65,6 +65,20 @@ const impact = defineCollection({
 });
 
 /**
+ * Raw HTML snippets, inserted verbatim into any page or impact post with
+ * `{{snippet-name}}` (see src/lib/snippets.ts). The file body is plain HTML —
+ * no frontmatter, no markdown processing. Edited in Pages CMS via the
+ * `snippets` collection (plain text field, so nothing rewrites the markup).
+ */
+const snippets = defineCollection({
+  loader: glob({ base: 'src/content/snippets', pattern: '**/*.md' }),
+  schema: z.object({
+    /** Optional label for the CMS; not rendered. */
+    title: z.string().optional(),
+  }),
+});
+
+/**
  * People (and the occasional non-human) shown as cards on the People page.
  * The markdown body is the bio — plain prose, rendered inside the card.
  */
@@ -102,4 +116,4 @@ const partners = defineCollection({
   }),
 });
 
-export const collections = { pages, impact, people, partners };
+export const collections = { pages, impact, people, partners, snippets };

@@ -88,7 +88,9 @@ content:
         required: false
 
       # Page body. Link an uploaded document with
-      # [Annual report](/documents/annual-report-2026.pdf)
+      # [Annual report](/documents/annual-report-2026.pdf).
+      # Insert a raw HTML snippet (see the Snippets collection) by putting
+      # `{{snippet-name}}` on a line of its own — it is replaced verbatim.
       - name: body
         label: Page Content
         type: rich-text
@@ -107,11 +109,13 @@ content:
         type: string
         required: true
 
+      # Date format uses date-fns tokens: MM = month, mm = MINUTES. The old
+      # `yyyy-mm-dd` wrote year-minutes-day (e.g. 2026-00-23) on every save.
       - name: pubDate
         label: Publish Date
         type: date
         options:
-          format: yyyy-mm-dd
+          format: yyyy-MM-dd
         required: true
 
       - name: description
@@ -160,7 +164,8 @@ content:
         required: false
 
       # Post body. Link an uploaded document with
-      # [Annual report](/documents/annual-report-2026.pdf)
+      # [Annual report](/documents/annual-report-2026.pdf).
+      # `{{snippet-name}}` inserts a raw HTML snippet verbatim (see Snippets).
       - name: body
         label: Content
         type: rich-text
@@ -252,3 +257,19 @@ content:
         type: rich-text
         options:
           media: images
+
+  # Raw HTML snippets, inserted verbatim into any page or impact post with
+  # `{{snippet-name}}` on a line of its own (like `{{cards}}`, but the HTML is
+  # exactly what you type here — no markdown, no rich-text rewriting). The
+  # filename becomes the name: contact-form.md -> {{contact-form}}.
+  # Use this for forms, embeds and scripts, which the rich-text body field
+  # would strip. The plain text editor below keeps the markup byte-for-byte.
+  - name: snippets
+    label: HTML Snippets
+    label_singular: HTML Snippet
+    type: collection
+    path: src/content/snippets
+    fields:
+      - name: body
+        label: HTML (inserted verbatim with {{name}})
+        type: text

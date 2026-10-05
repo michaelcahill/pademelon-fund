@@ -6,6 +6,7 @@ import PageLayout from '../layouts/PageLayout.astro';
 import PeopleGrid from '../components/PeopleGrid.astro';
 import { splitAtCards } from '../lib/cards';
 import { galleryFolderFor, getGalleryImages } from '../lib/galleries';
+import { injectSnippets } from '../lib/snippets';
 import { pickLayout } from '../lib/layouts';
 import { PROSE_CLASS } from '../lib/shell';
 
@@ -23,7 +24,12 @@ interface Props {
 }
 
 const { page } = Astro.props;
-const { Content } = await render(page);
+await render(page);
+
+// Raw HTML snippets: `{{snippet-name}}` placeholders become the snippet's
+// verbatim HTML (src/lib/snippets.ts). Everything below renders this string,
+// which is exactly what <Content /> would have output, placeholders resolved.
+const bodyHtml = await injectSnippets(page.rendered?.html ?? '');
 
 // A page becomes a gallery when its image folder has images in it.
 const folder = galleryFolderFor(page.data, page.id);
@@ -34,7 +40,7 @@ const layout = pickLayout(page.data.layout, images.length);
 // halves are the same HTML `<Content />` would render (RenderedContent holds it),
 // which lets the grid sit between them.
 const cards = page.data.cards;
-const split = cards && page.rendered ? splitAtCards(page.rendered.html) : undefined;
+const split = cards ? splitAtCards(bodyHtml) : undefined;
 ---
 
 {
@@ -46,9 +52,7 @@ const split = cards && page.rendered ? splitAtCards(page.rendered.html) : undefi
       group={folder}
       aspect={page.data.galleryAspect}
     >
-      <div slot="intro" class={PROSE_CLASS}>
-        <Content />
-      </div>
+      <div slot="intro" class={PROSE_CLASS} set:html={bodyHtml} />
     </GalleryLayout>
   ) : layout === 'home' ? (
     <HomeLayout
@@ -57,9 +61,7 @@ const split = cards && page.rendered ? splitAtCards(page.rendered.html) : undefi
       heroImage={page.data.heroImage}
       heroAlt={page.data.heroAlt ?? page.data.title}
     >
-      <div class={PROSE_CLASS}>
-        <Content />
-      </div>
+      <div class={PROSE_CLASS} set:html={bodyHtml} />
     </HomeLayout>
   ) : (
     <PageLayout
@@ -69,7 +71,7 @@ const split = cards && page.rendered ? splitAtCards(page.rendered.html) : undefi
       heroAlt={page.data.heroAlt}
     >
       {/* Text above the marker stays in PageLayout's own prose block. */}
-      {split ? <Fragment set:html={split.before} /> : <Content />}
+      {split ? <Fragment set:html={split.before} /> : <Fragment set:html={bodyHtml} />}
 
       <!-- The grid goes in the `after` slot, outside PageLayout's `.prose`
            wrapper, so the typography plugin cannot add its 2em image margins
