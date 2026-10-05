@@ -40,20 +40,24 @@ quality 82 halves their bytes without touching pixels (RMSE 2–6/255).
 **Never scale.** `pademelon-outline.png` (229×442) is drawn ~261 CSS px wide × 2 = 522px,
 so it is already upscaled — shrinking blurs the watermark. `philanthropy-aus.png` (100px
 tall) is shown in an 80 CSS px box = 160 device px, also already short.
-`rachel-honnery.png` (800²) sits exactly on the portrait limit. `IMG_flowers.png`
-(441×385) is below the impact card's 808px need and is upscaled today. The transparent
+`rachel-honnery.jpg` (800²) sits exactly on the portrait limit. `IMG_flowers.jpg`
+(441×385) is below the impact card's 808px need and is upscaled today — there is no larger
+copy of that photo, so it cannot be improved by resizing. The transparent
 PNGs (`pademelon-outline.png`, `pademelon-logo-small.png`, `favicon.png`) must stay PNG —
 they are line art, and JPEG destroys the alpha (RMSE 24–33/255).
 
-**Format change, biggest single wins.** `IMG_flowers.png` (294 KB) and
-`rachel-honnery.png` (627 KB) are fully-opaque photos in a PNG wrapper — as JPEG they
-become 32 KB and 62 KB. Renaming them means editing the frontmatter that points at
-`IMG_flowers.png`; `people/rachel-honnery.jpg` would be found by the filename convention
-(`PORTRAIT_EXT` order in `src/lib/people.ts` picks `.jpg` first).
+**Format change, biggest single wins — done.** `IMG_flowers.png` (294 KB) and
+`rachel-honnery.png` (627 KB) were fully-opaque photos in a PNG wrapper (alpha min 255 on
+every pixel), so they became JPEGs at the same dimensions: 32 KB and 62 KB, RMSE 3.6 and
+2.09 / 255 against the PNG. The frontmatter that pointed at `IMG_flowers.png` now points at
+the `.jpg`; the portrait needs no frontmatter because `PORTRAIT_EXT` in `src/lib/people.ts`
+lists `.jpg` first, and the `.png` was deleted so there is no ambiguity.
 
-**Duplicates.** `IMG_pademelon.jpg` ≡ `pademelon_photos/IMG_pademelon.jpg` and
+**Duplicates — done.** `IMG_pademelon.jpg` ≡ `pademelon_photos/IMG_pademelon.jpg` and
 `IMG_R&M mountain.jpg` ≡ `pademelon_photos/IMG_R&M mountain.jpg` (identical md5) — 2.9 MB
-of pure duplication.
+of pure duplication. The **top-level** copies are the ones kept: frontmatter heroes live at
+`/images/<file>` and galleries live in folders, so removing the folder copies keeps a hero
+from being repeated as a gallery tile on the same page.
 
 **Currently rendered nowhere.** `pademelon_photos/` (17 files, 21 MB) matches no entry
 slug and no `gallery:` field, so it is the "future gallery": wiring it up needs only
@@ -84,9 +88,14 @@ lightbox loses headroom.
 
 ## Applied (2026-10-05)
 
-26 JPEGs changed: 19 scaled to 1664 wide, 7 re-encoded at width ≤ 1664 with pixels
-untouched. No PNG touched, no filename changed. `public/images` 30 MB → 20 MB,
-`dist/images` 38 MB → 20 MB.
+**Scale-down.** 26 JPEGs changed: 19 scaled to 1664 wide, 7 re-encoded at width ≤ 1664 with
+pixels untouched. `public/images` 30 MB → 20 MB, `dist/images` 38 MB → 20 MB.
+
+**Dedupe + format.** Two duplicate JPEGs removed from `pademelon_photos/`, and the two
+opaque photo PNGs converted to JPEG (924 KB of PNG → 94 KB). `public/images` is now 17 MB
+(from 30 MB), and `dist/images` matches it.
+Four filenames changed, so one frontmatter path was edited (`IMG_flowers.jpg`) and one
+portrait resolves by convention (`people/rachel-honnery.jpg`).
 
 Checked after applying:
 
@@ -94,9 +103,11 @@ Checked after applying:
   mean per-channel RMSE 0.97–4.24 / 255, nothing above 8 — rotation and framing preserved,
   only re-encode noise.
 - Widest JPEG in `public/images` is now 1664px, so no hero is upscaled beyond Retina size.
-- `npm run build` clean (9 pages); hero `src` paths in the built HTML are unchanged
-  (`IMG_alpine.jpg`, `IMG_R&M mountain.jpg`, `WhatsApp …jpeg`, `IMG_pademelon.jpg`).
-- Preview server served the new bytes: home hero 442 KB, about hero 446 KB, contact hero
-  586 KB (were 873 / 871 / 1618 KB), and `dist` contains no backup folder.
+- `npm run build` clean (9 pages); every `src` in the built HTML points at a file that
+  exists — home `IMG_alpine.jpg`, about `About page photo.jpeg`, contact
+  `IMG_R&M mountain.jpg`, impact cards `IMG_pademelon.jpg` / `IMG_flowers.jpg`, portraits
+  `people/michael-cahill.jpg` / `people/rachel-honnery.jpg`.
+- Preview server served the new bytes: home hero 442 KB, about hero 347 KB, contact hero
+  586 KB (were 873 / 525 / 1618 KB), and `dist` contains no backup folder.
 
 Delete `scripts/.pre-resize-backup/` once the pages have been eyeballed on a Retina screen.

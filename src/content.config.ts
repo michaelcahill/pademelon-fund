@@ -97,7 +97,7 @@ const people = defineCollection({
     /** Short line under the name, e.g. "Co-founder". */
     role: z.string().optional(),
     /**
-     * Site-absolute portrait path, e.g. /images/people/rachel-honnery.png.
+     * Site-absolute portrait path, e.g. /images/people/rachel-honnery.jpg.
      * Omit to use `public/images/people/<slug>.<ext>` (any common extension).
      */
     image: z.string().optional(),
