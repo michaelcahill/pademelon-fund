@@ -1,50 +1,108 @@
 ---
-import { homeHref, navItems } from "../lib/navigation";
+import { isActive, navItems, homeHref } from "../lib/navigation";
 import { SHELL_CONTAINER } from "../lib/shell";
+
+const currentPath = Astro.url.pathname;
 ---
 
 <footer class="site-footer">
+    <!-- Bottom row: the copyright on the left, the two footer icons
+         right-aligned. There is no page list here — the menu lives in the card this
+         hamburger opens, which rises upwards from the row and is right-aligned with
+         the icons (see `.footer-menu` in global.css), so the menu appears where the
+         button is, at every width.
+
+         Scroll to top is a plain `#top` anchor: "top" is a predefined fragment in
+         HTML, so browsers jump there with no JavaScript, and `scroll-behavior:
+         smooth` in global.css makes it a glide. -->
     <div
         class:list={[
-            "grid gap-8 py-12 md:grid-cols-2 lg:grid-cols-[2fr_1fr]",
+            "hairline relative flex flex-wrap items-center justify-between gap-4 pb-6 pt-6 text-xs",
             SHELL_CONTAINER,
         ]}
     >
-        <div>
-            <h2 class="mb-3 text-xl font-bold text-slate-900">
-                <a href={homeHref} class="hover:text-emerald-700 transition">
-                    Pademelon Fund
-                </a>
-            </h2>
-            <p class="text-sm leading-relaxed text-slate-500">
-                Supporting grassroots action for nature, First Nations and
-                climate across Australia.
-            </p>
+        <p>
+            &copy; {new Date().getFullYear()} Pademelon Fund. All rights
+            reserved.
+        </p>
+
+        <div class="flex items-center gap-1">
+            <a href="#top" class="footer-icon rounded-md px-2">
+                <span class="sr-only">Scroll to top</span>
+                <svg
+                    class="size-6"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.75"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                >
+                    <path d="M12 19V5M5 12l7-7 7 7" />
+                </svg>
+            </a>
+
+            <button
+                type="button"
+                class="footer-toggle rounded-md px-2"
+                aria-expanded="false"
+                aria-controls="footer-menu"
+                data-nav-toggle
+            >
+                <span class="sr-only">Menu</span>
+                <svg
+                    class="size-6"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.75"
+                    stroke-linecap="round"
+                    aria-hidden="true"
+                >
+                    <path d="M4 7h16M4 12h16M4 17h16" />
+                </svg>
+            </button>
         </div>
 
-        <div>
-            <h3 class="mb-3 text-sm font-semibold text-slate-900">Pages</h3>
-            <ul class="space-y-2 text-sm">
-                {navItems.map((item) => (
-                    <li>
-                        <a
-                            href={item.href}
-                            class="text-slate-500 transition hover:text-emerald-700"
-                        >
-                            {item.label}
-                        </a>
-                    </li>
-                ))}
-            </ul>
+        <!-- The menu card: same white card (black ink) as the header dropdown,
+             anchored to this row so it opens upwards, right-aligned with the
+             icons. After the buttons in the DOM, so tabbing reaches the links
+             last and a closed card (`display: none`) is out of the tab order. -->
+        <div
+            class="footer-menu card"
+            id="footer-menu"
+            data-open="false"
+            data-nav-panel
+        >
+            <nav aria-label="Main">
+                <ul class="divide-y divide-slate-100">
+                    {navItems.map((item) => (
+                        <li>
+                            <a
+                                href={item.href}
+                                aria-current={
+                                    isActive(currentPath, item.href)
+                                        ? "page"
+                                        : undefined
+                                }
+                                class="nav-link-mobile"
+                            >
+                                {item.label}
+                            </a>
+                        </li>
+                    ))}
+                </ul>
+            </nav>
         </div>
     </div>
 
-    <div
-        class:list={[
-            "border-t border-slate-200 pb-6 pt-6 text-center text-xs text-slate-400",
-            SHELL_CONTAINER,
-        ]}
-    >
-        &copy; {new Date().getFullYear()} Pademelon Fund. All rights reserved.
-    </div>
+    <script>
+        // Each toggle opens the panel named by its `aria-controls` (see
+        // src/lib/nav-menu.ts), so this hamburger drives the card above it and
+        // the header toggle keeps driving the dropdown under the header.
+        import { initSiteMenu } from "../lib/nav-menu";
+
+        initSiteMenu();
+    </script>
 </footer>

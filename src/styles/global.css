@@ -211,6 +211,34 @@ main a {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
+/* Footer icons — the menu hamburger and scroll-to-top, right-aligned at the end
+ * of the footer's bottom row. They are chrome, so they follow the nav rule:
+ * dimmed white ink that brightens on hover/focus, no underline.
+ *
+ * The hamburger drives the dropdown with JavaScript, so it is hidden from a
+ * no-JS visitor (the same `html.js` gate as the header toggle): `.footer-toggle`
+ * starts at `display: none` and the `html.js` rule outranks it on specificity
+ * (0,2,1 vs 0,1,0), so source order does not matter here. */
+.footer-icon,
+html.js .footer-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.footer-toggle {
+  display: none;
+}
+
+.footer-icon:hover,
+.footer-icon:focus-visible,
+.footer-toggle:hover,
+.footer-toggle:focus-visible {
+  color: #fff;
+}
+
 /* Stop iOS Safari inflating text after a device rotation. */
 .min-h-screen-safe {
   min-height: 100dvh;
@@ -238,8 +266,21 @@ button {
    * is capped at max-w-4xl, so extra letter spacing at desktop widths buys
    * nothing and risks pushing the last item onto a second line. */
 .nav-bar {
-  @apply items-center gap-5 xl:gap-6;
   display: none;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+/* `min-width` rather than the newer `(width >= …)` range syntax: the range form
+ * parses in Chrome 102+/Safari 16.4+ and is *dropped* by older engines, which
+ * leaves `.nav-bar` at `display: none` on every width — the labels never show
+ * and the header reads as a permanent hamburger menu.
+ */
+@media (min-width: 40rem) {
+  .nav-bar {
+    display: flex;
+    gap: 1.5rem;
+  }
 }
 
 /* Hidden by default so a no-JS visitor never sees a dead button. */
@@ -248,14 +289,25 @@ button {
 }
 
 html.js .nav-toggle {
-  @apply items-center gap-2 text-sm font-medium text-slate-600 hover:text-emerald-700;
-  /* 44px minimum touch target for iOS. */
   display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   min-height: 2.75rem;
+  color: #fff;
 }
 
 .nav-toggle .icon-close {
   display: none;
+}
+
+/* Above the breakpoint the labels fit in the bar, so the toggle has to go —
+ * otherwise `html.js` shows a hamburger next to a full menu on desktop. Same
+ * selector as the rule above, so source order (this one is later) decides.
+ */
+@media (min-width: 40rem) {
+  html.js .nav-toggle {
+    display: none;
+  }
 }
 
 .nav-toggle[aria-expanded="true"] .icon-open {
@@ -263,50 +315,76 @@ html.js .nav-toggle {
 }
 
 .nav-toggle[aria-expanded="true"] .icon-close {
-  @apply text-slate-500;
   display: block;
 }
 
-.nav-panel {
-  @apply border-t border-slate-200 bg-white shadow-lg;
-  /* Drops down over the page rather than pushing content around. */
+/* The two menu cards — the header dropdown and the footer card. Both are white
+ * cards (black ink, so `.card` supplies their colours) with one width, each
+ * right-aligned under the hamburger that opens it, anchored to the `relative`
+ * row that carries SHELL_CONTAINER. One width for both keeps the menu reading as
+ * a single component at both ends of the page; a card that stretched across the
+ * shell on a phone would cover the whole page, and the five short labels need far
+ * less than 13rem.
+ *
+ * Without JavaScript the cards are static, so each end of the page shows the menu
+ * as a stacked list in the flow (the rows wrap onto their own line, because both
+ * rows carry `flex-wrap`) instead of an empty card floating over the content.
+ *
+ * The footer hamburger lives in the footer row, so that menu is available at every
+ * width; the header dropdown only appears below --breakpoint-nav. */
+.nav-panel,
+.footer-menu {
+  position: static;
+  width: 100%;
+}
+
+html.js .nav-panel,
+html.js .footer-menu {
   position: absolute;
-  left: 0;
   right: 0;
-  top: 100%;
-  display: block;
+  width: 13rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.25);
 }
 
-html.js .nav-panel:not([data-open="true"]) {
+/* The header card hangs below its row; the footer card opens upwards from its row. */
+.nav-panel {
+  top: 100%;
+}
+
+.footer-menu {
+  bottom: 100%;
+}
+
+html.js .nav-panel:not([data-open="true"]),
+html.js .footer-menu:not([data-open="true"]) {
   display: none;
 }
 
 /* Menu links: full-width rows with comfortable tap targets. */
 .nav-link-mobile {
-  @apply block px-5 py-3 text-base font-medium text-slate-700 transition hover:bg-slate-50 hover:text-emerald-700;
+  display: block;
+  padding: 0.75rem 1.25rem;
+  font-size: 1rem;
+  font-weight: 500;
 }
 
-@media (width >= 40rem) {
-  .nav-bar {
-    display: flex;
-  }
-
-  html.js .nav-toggle {
-    display: none;
-  }
-
-  .nav-panel {
-    display: none;
-  }
-}
-
-/* Nav links */
+/* Nav links. Chrome, so no underline: the current page is marked by ink
+ * strength instead of a rule — inactive links dimmed, active at full white
+ * (≈5:1 on the header, so the dimming stays readable). Hover brightens a link
+ * to the active colour, giving a cue that underlines used to supply.
+ *
+ * `aria-current="page"` is set in Nav.astro, so the active state is announced
+ * as well as shown.
+ */
 .nav-link {
-  @apply text-sm font-medium text-slate-600 hover:text-emerald-700 transition;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.65);
 }
 
+.nav-link:hover,
 .nav-link-active {
-  @apply text-sm font-medium text-emerald-700 underline decoration-2 underline-offset-8;
+  color: #fff;
 }
 
 /* ---------------------------------------------------------------------------

@@ -5,23 +5,23 @@ import { SHELL_CONTAINER } from "../lib/shell";
 const currentPath = Astro.url.pathname;
 ---
 
-<header class="site-header" data-site-header>
+<header class="site-header">
     <div
         class:list={[
-            "relative flex h-16 items-center justify-between gap-4",
+            "relative flex min-h-16 flex-wrap items-center justify-between gap-4",
             SHELL_CONTAINER,
         ]}
     >
         <a
             href={homeHref}
-            class="flex shrink-0 items-center gap-1 text-lg font-bold text-brand transition hover:text-brand-dark"
+            class="flex shrink-0 items-center gap-1 text-lg font-bold"
         >
             <img
                 src="/images/pademelon-logo-small.png"
                 alt="Pademelon Fund logo"
                 width={64}
                 height={64}
-                class="h-5 w-auto"
+                class="gap-1"
                 loading="eager"
             />
             Pademelon Fund
@@ -77,79 +77,46 @@ const currentPath = Astro.url.pathname;
                 <path d="M6 6l12 12M18 6L6 18" />
             </svg>
         </button>
-    </div>
 
-    <!-- Narrow screens: dropdown panel -->
-    <div class="nav-panel" id="site-menu" data-open="false" data-nav-panel>
-        <nav aria-label="Main">
-            <ul class="divide-y divide-slate-100">
-                {navItems.map((item) => (
-                    <li>
-                        <a
-                            href={item.href}
-                            aria-current={
-                                isActive(currentPath, item.href)
-                                    ? "page"
-                                    : undefined
-                            }
-                            class:list={[
-                                "nav-link-mobile",
-                                isActive(currentPath, item.href) &&
-                                    "bg-slate-50 text-emerald-700",
-                            ]}
-                        >
-                            {item.label}
-                        </a>
-                    </li>
-                ))}
-            </ul>
-        </nav>
+        <!-- Narrow screens: dropdown panel. The same white card as the footer
+             menu, right-aligned under the hamburger. It sits inside the row (the
+             `relative` element capped by SHELL_CONTAINER), so its right edge lines
+             up with the toggle instead of the viewport edge. -->
+        <div
+            class="nav-panel card"
+            id="site-menu"
+            data-open="false"
+            data-nav-panel
+        >
+            <nav aria-label="Main">
+                <ul class="divide-y divide-slate-100">
+                    {navItems.map((item) => (
+                        <li>
+                            <a
+                                href={item.href}
+                                aria-current={
+                                    isActive(currentPath, item.href)
+                                        ? "page"
+                                        : undefined
+                                }
+                                class="nav-link-mobile"
+                            >
+                                {item.label}
+                            </a>
+                        </li>
+                    ))}
+                </ul>
+            </nav>
+        </div>
     </div>
 </header>
 
 <script>
-    const header = document.querySelector("[data-site-header]");
+    // Wiring is shared with the footer hamburger (src/lib/nav-menu.ts): each
+    // toggle drives the panel named by its `aria-controls`, so this button keeps
+    // the dropdown under the header and the footer opens its own card. The
+    // module installs its listeners once, whichever component calls it first.
+    import { initSiteMenu } from "../lib/nav-menu";
 
-    if (header) {
-        const toggle = header.querySelector("[data-nav-toggle]");
-        const panel = header.querySelector("[data-nav-panel]");
-
-        if (toggle instanceof HTMLElement && panel) {
-            const setOpen = (open: boolean) => {
-                toggle.setAttribute("aria-expanded", String(open));
-                panel.setAttribute("data-open", String(open));
-            };
-            const isOpen = () =>
-                toggle.getAttribute("aria-expanded") === "true";
-
-            toggle.addEventListener("click", () => setOpen(!isOpen()));
-
-            // Close after choosing a destination.
-            panel.addEventListener("click", (event) => {
-                if ((event.target as Element | null)?.closest("a"))
-                    setOpen(false);
-            });
-
-            document.addEventListener("keydown", (event) => {
-                if (event.key === "Escape" && isOpen()) {
-                    setOpen(false);
-                    toggle.focus();
-                }
-            });
-
-            // Reset state when the dropdown is no longer needed. The breakpoint is read
-            // from CSS (--breakpoint-nav) so JavaScript and styles cannot drift apart.
-            const cssBreakpoint = getComputedStyle(document.documentElement)
-                .getPropertyValue("--breakpoint-nav")
-                .trim();
-            const wide = window.matchMedia(
-                `(min-width: ${cssBreakpoint || "48rem"})`,
-            );
-            const onChange = (event: MediaQueryListEvent) => {
-                if (event.matches) setOpen(false);
-            };
-            if (typeof wide.addEventListener === "function")
-                wide.addEventListener("change", onChange);
-        }
-    }
+    initSiteMenu();
 </script>
