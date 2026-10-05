@@ -2,6 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import HomeLayout from '../layouts/HomeLayout.astro';
 import { injectSnippets } from '../lib/snippets';
+import { PROSE_CLASS } from '../lib/shell';
 
 const home = await getCollection('pages', ({ id }) => id === 'home').then(
   (pages) => pages[0],
@@ -23,5 +24,5 @@ const bodyHtml = await injectSnippets(home.rendered?.html ?? '');
   heroImage={home.data.heroImage}
   heroAlt={home.data.heroAlt ?? home.data.title}
 >
-  <div class="prose prose-slate prose-emerald max-w-none" set:html={bodyHtml} />
+  <div class={PROSE_CLASS} set:html={bodyHtml} />
 </HomeLayout>

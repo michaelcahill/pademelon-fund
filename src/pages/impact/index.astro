@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { countGalleryImages, galleryFolderFor } from '../../lib/galleries';
 import { withBase } from '../../lib/paths';
+import { FULL_WIDTH } from '../../lib/shell';
 
 const impactPosts = (await getCollection('impact')).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
@@ -14,25 +15,29 @@ const description =
 ---
 
 <BaseLayout title="Impact" description={description}>
-  <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+  <!-- Title, standfirst and the card grid span all three columns; the pademelon
+       watermark keeps the left column clear (see src/lib/shell.ts). -->
+  <h1 class:list={['text-3xl font-extrabold tracking-tight sm:text-4xl', FULL_WIDTH]}>
     Impact
   </h1>
 
-  <p class="mt-3 text-lg leading-relaxed text-slate-600">
+  <p class:list={['mt-3 text-lg leading-relaxed', FULL_WIDTH]}>
     {description}
   </p>
 
   {
     impactPosts.length === 0 ? (
-      <p class="mt-6 text-slate-600">No impact stories posted yet. Check back soon.</p>
+      <p class:list={['mt-6', FULL_WIDTH]}>
+        No impact stories posted yet. Check back soon.
+      </p>
     ) : (
       // One column on phones, two from small tablets up.
-      <ul class="mt-8 grid gap-6 sm:grid-cols-2">
+      <ul class:list={['mt-8 grid gap-6 sm:grid-cols-2', FULL_WIDTH]}>
         {impactPosts.map((post) => {
           const photoCount = countGalleryImages(galleryFolderFor(post.data, post.id));
 
           return (
-            <li class="flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:border-emerald-200 hover:shadow-md">
+            <li class="card flex flex-col">
               {post.data.image ? (
                 <img
                   src={withBase(post.data.image)}
@@ -46,34 +51,31 @@ const description =
               <div class="flex flex-grow flex-col p-5">
                 <time
                   datetime={post.data.pubDate.toISOString()}
-                  class="text-xs font-semibold uppercase tracking-wider text-emerald-700"
+                  class="text-xs font-semibold uppercase tracking-wider"
                 >
                   {post.data.pubDate.toLocaleDateString('en-AU', { dateStyle: 'medium' })}
                 </time>
 
-                <h2 class="mt-2 text-lg font-bold leading-snug text-slate-900">
-                  <a
-                    href={withBase(`/impact/${post.id}`)}
-                    class="transition hover:text-emerald-700"
-                  >
+                <h2 class="mt-2 text-lg font-bold leading-snug">
+                  <a href={withBase(`/impact/${post.id}`)}>
                     {post.data.title}
                   </a>
                 </h2>
 
-                <p class="mt-2 grow text-sm leading-relaxed text-slate-600">
+                <p class="mt-2 grow text-sm leading-relaxed">
                   {post.data.description}
                 </p>
 
-                <div class="mt-4 flex items-center gap-3 text-xs font-medium text-emerald-700">
+                <div class="mt-4 flex items-center gap-3 text-xs font-medium">
                   <a
                     href={withBase(`/impact/${post.id}`)}
-                    class="inline-flex min-h-11 items-center transition hover:text-emerald-800"
+                    class="inline-flex min-h-11 items-center"
                   >
                     Read more &rarr;
                   </a>
 
                   {photoCount > 0 ? (
-                    <span class="text-slate-500">
+                    <span>
                       · {photoCount} photo{photoCount === 1 ? '' : 's'}
                     </span>
                   ) : null}

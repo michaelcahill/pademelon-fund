@@ -1,79 +1,86 @@
 ---
-import { render } from 'astro:content';
-import { getPeople, portraitFor, type Person } from '../lib/people';
+import { render } from "astro:content";
+import { getPeople, portraitFor, type Person } from "../lib/people";
 
 interface Props {
-  /** Optional heading above the grid (level 2). */
-  heading?: string;
-  /** Cards per row on wide screens. Two keeps long bios readable. */
-  columns?: 2 | 3;
-  /** Restrict the grid to these slugs (in this order). Empty = everyone. */
-  only?: string[];
+    /** Optional heading above the grid (level 2). */
+    heading?: string;
+    /** Cards per row on wide screens. Two keeps long bios readable. */
+    columns?: 2 | 3;
+    /** Restrict the grid to these slugs (in this order). Empty = everyone. */
+    only?: string[];
 }
 
 const { heading, columns = 2, only = [] } = Astro.props;
 
 const all = await getPeople();
 const people: Person[] = only.length
-  ? (only.map((slug) => all.find((p) => p.id === slug)).filter(Boolean) as Person[])
-  : all;
+    ? (only
+          .map((slug) => all.find((p) => p.id === slug))
+          .filter(Boolean) as Person[])
+    : all;
 
 const cards = await Promise.all(
-  people.map(async (person) => ({
-    person,
-    Content: (await render(person)).Content,
-  })),
+    people.map(async (person) => ({
+        person,
+        Content: (await render(person)).Content,
+    })),
 );
 
-const gridClass = columns === 3 ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1 sm:grid-cols-2';
+const gridClass =
+    columns === 3
+        ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+        : "grid-cols-1 sm:grid-cols-2";
 ---
 
 {people.length > 0 ? (
-  <section class="mt-10">
-    {heading ? (
-      <h2 class="text-2xl font-extrabold tracking-tight text-slate-900">{heading}</h2>
-    ) : null}
+    <section class="mt-10">
+        {heading ? (
+            <h2 class="text-2xl font-extrabold tracking-tight">{heading}</h2>
+        ) : null}
 
-    <ul class:list={['mt-6 grid gap-6', gridClass]}>
-      {cards.map(({ person, Content }) => (
-        <li class="flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-          {portraitFor(person) ? (
-            <img
-              src={portraitFor(person)}
-              alt={person.data.imageAlt ?? person.data.name}
-              class="aspect-square w-full object-cover"
-              loading="lazy"
-              decoding="async"
-            />
-          ) : null}
+        <ul class:list={["mt-6 grid gap-6", gridClass]}>
+            {cards.map(({ person, Content }) => (
+                <li class="card flex flex-col">
+                    {portraitFor(person) ? (
+                        <img
+                            src={portraitFor(person)}
+                            alt={person.data.imageAlt ?? person.data.name}
+                            class="aspect-square w-full object-cover"
+                            loading="lazy"
+                            decoding="async"
+                        />
+                    ) : null}
 
-          <div class="flex grow flex-col p-6">
-            <h2 class="text-lg font-bold leading-snug text-slate-900">{person.data.name}</h2>
+                    <div class="flex grow flex-col p-6">
+                        <h2 class="text-lg font-bold leading-snug">
+                            {person.data.name}
+                        </h2>
 
-            {person.data.role ? (
-              <p class="mt-1 text-xs font-semibold uppercase tracking-wider text-emerald-700">
-                {person.data.role}
-              </p>
-            ) : null}
+                        {person.data.role ? (
+                            <h3 class="mt-1 text-xs font-semibold uppercase tracking-wider">
+                                {person.data.role}
+                            </h3>
+                        ) : null}
 
-            <!-- The bio is the markdown file's body: prose, lists and links all work. -->
-            <div class="prose prose-slate prose-sm mt-4 grow max-w-none">
-              <Content />
-            </div>
+                        <!-- The bio is the markdown file's body: prose, lists and links all work. -->
+                        <div class="prose prose-sm mt-4 grow max-w-none">
+                            <Content />
+                        </div>
 
-            {person.data.link ? (
-              <a
-                href={person.data.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-emerald-700 transition hover:text-emerald-800"
-              >
-                {person.data.linkLabel ?? 'More'} &rarr;
-              </a>
-            ) : null}
-          </div>
-        </li>
-      ))}
-    </ul>
-  </section>
+                        {person.data.link ? (
+                            <a
+                                href={person.data.link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="mt-4 inline-flex min-h-11 items-center text-sm font-semibold"
+                            >
+                                {person.data.linkLabel ?? "More"} &rarr;
+                            </a>
+                        ) : null}
+                    </div>
+                </li>
+            ))}
+        </ul>
+    </section>
 ) : null}

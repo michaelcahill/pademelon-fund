@@ -8,7 +8,12 @@ import { splitAtCards } from '../lib/cards';
 import { galleryFolderFor, getGalleryImages } from '../lib/galleries';
 import { injectSnippets } from '../lib/snippets';
 import { pickLayout } from '../lib/layouts';
-import { PROSE_CLASS } from '../lib/shell';
+import {
+  FULL_GRID,
+  FULL_WIDTH,
+  PROSE_CLASS,
+  TEXT_COLUMN,
+} from '../lib/shell';
 
 export async function getStaticPaths() {
   // 'home' is rendered by src/pages/index.astro, not as a slug route.
@@ -78,10 +83,17 @@ const split = cards ? splitAtCards(bodyHtml) : undefined;
            around each portrait; any text written below the marker follows it in
            matching prose styling. Without a marker the cards simply come last. -->
       {cards ? (
-        <div slot="after">
-          <PeopleGrid />
+        /* The `after` slot nests the same three-column split: cards span all
+           three columns, any trailing prose reads in the right two. */
+        <div slot="after" class:list={[FULL_GRID]}>
+          <div class:list={[FULL_WIDTH]}>
+            <PeopleGrid />
+          </div>
           {split?.after ? (
-            <div class:list={[PROSE_CLASS, 'mt-10']} set:html={split.after} />
+            <div
+              class:list={[PROSE_CLASS, 'mt-10', TEXT_COLUMN]}
+              set:html={split.after}
+            />
           ) : null}
         </div>
       ) : null}

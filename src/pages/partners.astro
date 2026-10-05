@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { withBase } from '../lib/paths';
+import { FULL_WIDTH } from '../lib/shell';
 
 interface Partner {
   name: string;
@@ -26,22 +27,20 @@ const partners = (
 >
   <!-- The width cap sits on the heading, not the article, so the description
        below spans the full container. -->
-  <article>
-    <h1 class="max-w-prose text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+  <article class:list={[FULL_WIDTH]}>
+    <h1 class="max-w-prose text-3xl font-extrabold tracking-tight sm:text-4xl">
       Our Partners
     </h1>
-    <p class="mt-5 text-lg leading-relaxed text-slate-600">
+    <p class="mt-5 text-lg leading-relaxed">
       The Pademelon Fund is an active member of philanthropic circles, including
       the Australian Environmental Grantmakers' Network (AEGN), the Nature Impact
       Collective (NIC), Groundswell Giving, and Philanthropy Australia.
     </p>
   </article>
 
-  <ul class="mt-10 grid gap-6 sm:grid-cols-2">
+  <ul class:list={['mt-10 grid gap-6 sm:grid-cols-2', FULL_WIDTH]}>
     {partners.map((partner) => (
-      <li
-        class="flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
-      >
+      <li class="card flex flex-col p-6">
         {partner.logo ? (
           partner.link ? (
             <a
@@ -71,21 +70,21 @@ const partners = (
               href={partner.link}
               target="_blank"
               rel="noopener noreferrer"
-              class="text-base font-bold text-emerald-700 transition hover:text-emerald-800"
+              class="text-base font-bold"
             >
               {partner.name}
             </a>
           ) : (
-            <span class="text-base font-bold text-slate-900">{partner.name}</span>
+            <span class="text-base font-bold">{partner.name}</span>
           )
         )}
 
-        <h2 class="mt-4 text-lg font-bold leading-snug text-slate-900">
+        <h2 class="mt-4 text-lg font-bold leading-snug">
           {partner.name}
         </h2>
 
         {partner.description ? (
-          <p class="mt-2 grow text-sm leading-relaxed text-slate-600">
+          <p class="mt-2 grow text-sm leading-relaxed">
             {partner.description}
           </p>
         ) : null}

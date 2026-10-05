@@ -1,7 +1,12 @@
 ---
 import BaseLayout from './BaseLayout.astro';
 import EntryHeader from '../components/EntryHeader.astro';
-import { PROSE_CLASS } from '../lib/shell';
+import {
+  FULL_GRID,
+  FULL_WIDTH,
+  PROSE_CLASS,
+  TEXT_COLUMN,
+} from '../lib/shell';
 
 interface Props {
   title: string;
@@ -27,8 +32,11 @@ const {
 ---
 
 <BaseLayout title={title} description={description}>
-  <article>
+  <!-- Title, standfirst and hero span the whole shell; only the body text is
+       pulled into the right two columns (see src/lib/shell.ts). -->
+  <article class:list={[FULL_GRID]}>
     <EntryHeader
+      rootClass={FULL_WIDTH}
       title={title}
       description={description}
       pubDate={pubDate}
@@ -37,16 +45,16 @@ const {
     />
 
     <!-- The typography plugin handles headings, lists, quotes and media. -->
-    <div class:list={[PROSE_CLASS, 'mt-8']}>
+    <div class:list={[PROSE_CLASS, 'mt-8', TEXT_COLUMN]}>
       <slot />
     </div>
 
     {
       backHref ? (
-        <div class="mt-12 border-t border-slate-200 pt-6">
+        <div class:list={['hairline mt-12 pt-6', FULL_WIDTH]}>
           <a
             href={backHref}
-            class="inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-emerald-700 transition hover:text-emerald-800"
+            class="inline-flex min-h-11 items-center gap-1 text-sm font-semibold"
           >
             &larr; {backLabel}
           </a>

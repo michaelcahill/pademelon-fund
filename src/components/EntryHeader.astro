@@ -11,6 +11,13 @@ interface Props {
   heroAlt?: string;
   /** Tailwind width class for the heading/lead text on wide pages. */
   textClass?: string;
+  /**
+   * Classes for the `<header>` element itself. Used for its span in the
+   * three-column page shell (`FULL_WIDTH` — see src/lib/shell.ts). Astro does
+   * not merge a `class` prop into a component's root, so this has to be an
+   * explicit prop applied inside the component.
+   */
+  rootClass?: string;
 }
 
 const {
@@ -20,15 +27,16 @@ const {
   heroImage,
   heroAlt,
   textClass = 'max-w-2xl',
+  rootClass,
 } = Astro.props;
 ---
 
-<header>
+<header class:list={[rootClass]}>
   {
     pubDate ? (
       <time
         datetime={pubDate.toISOString()}
-        class="text-xs font-semibold uppercase tracking-wider text-emerald-700"
+        class="text-xs font-semibold uppercase tracking-wider"
       >
         {pubDate.toLocaleDateString('en-AU', { dateStyle: 'long' })}
       </time>
@@ -37,7 +45,7 @@ const {
 
   <h1
     class:list={[
-      'mt-1 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl',
+      'mt-1 text-3xl font-extrabold tracking-tight sm:text-4xl',
       textClass,
     ]}
   >
@@ -46,7 +54,7 @@ const {
 
   <!-- Deliberately not width-capped by `textClass`: headings stay in the narrow
        column, but the standfirst spans the full container. -->
-  {description ? <p class="mt-3 text-lg leading-relaxed text-slate-600">{description}</p> : null}
+  {description ? <p class="mt-3 text-lg leading-relaxed">{description}</p> : null}
 
   {heroImage ? (
     <img

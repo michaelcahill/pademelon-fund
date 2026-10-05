@@ -4,6 +4,7 @@ import GalleryLayout from '../../layouts/GalleryLayout.astro';
 import PageLayout from '../../layouts/PageLayout.astro';
 import { galleryFolderFor, getGalleryImages } from '../../lib/galleries';
 import { pickLayout } from '../../lib/layouts';
+import { PROSE_CLASS } from '../../lib/shell';
 import { injectSnippets } from '../../lib/snippets';
 import { impactHref } from '../../lib/navigation';
 
@@ -43,7 +44,7 @@ const layout = pickLayout(post.data.layout, images.length);
       backHref={impactHref}
       backLabel="Back to all impact stories"
     >
-      <div slot="intro" class="prose prose-slate prose-emerald max-w-none" set:html={bodyHtml} />
+      <div slot="intro" class={PROSE_CLASS} set:html={bodyHtml} />
     </GalleryLayout>
   ) : (
     <PageLayout

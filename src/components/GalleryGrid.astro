@@ -31,7 +31,7 @@ const gridClass =
 
 {
   images.length === 0 ? (
-    <p class="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-6 text-center text-sm text-slate-500">
+    <p class="empty p-6 text-center text-sm">
       No images in this gallery yet. Add image files to the gallery folder to see them here.
     </p>
   ) : (
@@ -42,7 +42,7 @@ const gridClass =
             <figure class="group">
               <a
                 href={image.src}
-                class="block overflow-hidden rounded-lg bg-slate-100 ring-1 ring-slate-200 transition hover:ring-emerald-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
+                class="tile block overflow-hidden focus-visible:outline-2 focus-visible:outline-offset-2"
                 style={`aspect-ratio: ${aspect}`}
                 data-lightbox=""
                 data-gallery={group}
@@ -64,7 +64,7 @@ const gridClass =
               </a>
 
               {showCaptions && image.alt ? (
-                <figcaption class="mt-2 text-xs leading-snug text-slate-500">
+                <figcaption class="mt-2 text-xs leading-snug">
                   {image.alt}
                 </figcaption>
               ) : null}

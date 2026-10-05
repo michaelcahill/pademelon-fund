@@ -3,6 +3,7 @@ import BaseLayout from './BaseLayout.astro';
 import EntryHeader from '../components/EntryHeader.astro';
 import GalleryGrid from '../components/GalleryGrid.astro';
 import type { GalleryImage } from '../lib/galleries';
+import { FULL_GRID, FULL_WIDTH, TEXT_COLUMN } from '../lib/shell';
 
 interface Props {
   title: string;
@@ -33,29 +34,39 @@ const {
 ---
 
 <BaseLayout title={title} description={description}>
-  <article>
-    <EntryHeader title={title} description={description} pubDate={pubDate} />
+  <!-- Title, standfirst and the tile grid span the whole shell; prose reads in
+       the right two columns (see src/lib/shell.ts). -->
+  <article class:list={[FULL_GRID]}>
+    <EntryHeader
+      rootClass={FULL_WIDTH}
+      title={title}
+      description={description}
+      pubDate={pubDate}
+    />
 
     {
       /* Any prose the entry supplies is kept to a readable measure; the grid
          below uses the full width of the standard page shell. */
-      <div class="mt-2 max-w-prose">
+      <div class:list={['mt-2 max-w-prose', TEXT_COLUMN]}>
         <slot name="intro" />
       </div>
     }
 
-    <div class="mt-8">
+    <div class:list={['mt-8', FULL_WIDTH]}>
       <GalleryGrid images={images} group={group ?? title} aspect={aspect} showCaptions={showCaptions} />
     </div>
 
-    <slot />
+    <!-- Extra prose: slot content supplies its own spacing. -->
+    <div class:list={[TEXT_COLUMN]}>
+      <slot />
+    </div>
 
     {
       backHref ? (
-        <div class="mt-12 border-t border-slate-200 pt-6">
+        <div class:list={['hairline mt-12 pt-6', FULL_WIDTH]}>
           <a
             href={backHref}
-            class="inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-emerald-700 transition hover:text-emerald-800"
+            class="inline-flex min-h-11 items-center gap-1 text-sm font-semibold"
           >
             &larr; {backLabel}
           </a>

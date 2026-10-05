@@ -2,9 +2,10 @@
 import '../styles/global.css';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
+import Background from '../components/Background.astro';
 import { withBase } from '../lib/paths';
 import { defaultDescription, pageTitle, siteName } from '../lib/site';
-import { SHELL_CONTAINER } from '../lib/shell';
+import { SHELL_CONTAINER, SHELL_GRID } from '../lib/shell';
 
 interface Props {
   title: string;
@@ -31,7 +32,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin).hr
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <meta name="color-scheme" content="light" />
-    <meta name="theme-color" content="#ffffff" />
+    <meta name="theme-color" content="#3d4746" />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={siteName} />
@@ -51,7 +52,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin).hr
     <slot name="head" />
   </head>
 
-  <body class="flex min-h-screen-safe flex-col bg-white text-slate-800 antialiased">
+  <body class="flex min-h-screen-safe flex-col antialiased">
     <a
       href="#main"
       class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-emerald-700 focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white"
@@ -59,12 +60,186 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin).hr
       Skip to content
     </a>
 
+    <!-- Reactive green background (parallax + section image swap). Alpine is
+         started by the script at the bottom of this file. -->
+    <Background />
+
     <Nav />
 
-    <main id="main" class:list={['flex-grow py-10 sm:py-12', SHELL_CONTAINER]}>
+    <main
+      id="main"
+      class:list={[
+        'relative flex-grow py-10 sm:py-12',
+        SHELL_CONTAINER,
+        SHELL_GRID,
+      ]}
+    >
+      <!-- Pademelon watermark on every page.
+
+           Two states, driven by the `watermark` Alpine component registered at
+           the bottom of this file:
+           - floating: `position: fixed`, 1.5rem above the bottom of the window,
+             `left` measured from main's left edge so it stays in line with the
+             page shell;
+           - resting: `position: absolute`, 1.5rem above main's bottom edge —
+             i.e. above the footer's rule — which is where it lands once the
+             footer scrolls into view.
+
+           `position: sticky` cannot do this: sticky offsets only *clamp* a box
+           inside its container, they never pull it toward the viewport, so an
+           image at the top of a long `main` stays at the top.
+
+           The classes below are the no-JS fallback (the resting state): inline
+           styles from Alpine outrank them when JS runs. `-z-10` puts the image
+           behind content: `main` is `relative` with z-index auto, so it is not a
+           stacking context and the negative index resolves against the root —
+           above the fixed <Background /> layer (same index, later in tree order)
+           and below normal page content. Opacity lives in global.css
+           (`.pademelon-mark`). Decorative: empty alt + aria-hidden keeps it out
+           of the a11y tree. -->
+      <!-- Column probe: an empty grid item in column 1. The watermark measures
+           its width so the drawing scales to the left column that the text
+           columns leave free. It is zero-height, so it cannot shift content.
+           Below `lg` the grid is inert and the probe reports main's full content
+           width — far too big for a phone — which `measure` ignores, leaving the
+           responsive class widths below as the fallback. -->
+      <div id="watermark-probe" class="lg:col-span-1" aria-hidden="true"></div>
+
+      <img
+        src={withBase('/images/pademelon-outline.png')}
+        alt=""
+        aria-hidden="true"
+        x-data="watermark()"
+        x-bind:style="pos"
+        class="pademelon-mark pointer-events-none absolute bottom-6 left-0 -z-10 w-24 sm:w-32 lg:w-40"
+        decoding="async"
+      />
+
+      <!-- Slot children are grid items, so each block declares its own span:
+           `TEXT_COLUMN` (right two columns) for reading text, `FULL_WIDTH`
+           (all three) for titles, descriptions, hero images and card grids.
+           Layouts nest the same split with `FULL_GRID`. The probe and the image
+           sit outside the flow (the image is fixed/absolute), so neither takes a
+           grid cell. -->
       <slot />
     </main>
 
     <Footer />
+
+    <!-- Alpine.js: started once, registers the `background` data component
+         used by <Background />. The data is registered before Alpine.start()
+         so every x-data="background()" instance is ready when Alpine scans
+         the DOM. -->
+    <script type="module">
+      import Alpine from 'alpinejs';
+
+      Alpine.data('background', () => ({
+        current: null,
+        _images: {},
+        init() {
+          const el = this.$el;
+          this._images = JSON.parse(
+            el.getAttribute('data-bg-images') || '{}',
+          );
+          this.current = this._images.default || '';
+
+          // Parallax: write `--bg-y` directly on each scroll frame. This stays
+          // on the compositor (the CSS `parallax-bg` utility reads the
+          // variable) and avoids re-rendering the Alpine template at 60fps.
+          if (
+            !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+          ) {
+            let raf = null;
+            const onScroll = () => {
+              if (raf) cancelAnimationFrame(raf);
+              raf = requestAnimationFrame(() => {
+                el.style.setProperty(
+                  '--bg-y',
+                  (window.scrollY || 0) + 'px',
+                );
+              });
+            };
+            window.addEventListener('scroll', onScroll, { passive: true });
+          }
+
+          // Section-aware image swap: when a section with a `data-bg` attribute
+          // scrolls into view, switch the background to match its theme.
+          const onSectionVisible = (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                const key = entry.target.getAttribute('data-bg');
+                if (key && this._images[key]) {
+                  this.current = this._images[key];
+                }
+              }
+            });
+          };
+          const observer = new IntersectionObserver(onSectionVisible, {
+            threshold: 0.4,
+          });
+          document
+            .querySelectorAll('[data-bg]')
+            .forEach((node) => observer.observe(node));
+        },
+      }));
+
+      // Pademelon watermark: floats 1.5rem above the bottom of the window while
+      // a long page scrolls, and rests above the footer rule once the footer is
+      // in view. `position: sticky` cannot do this — sticky offsets clamp a box
+      // inside its container, they never pull it toward the viewport.
+      Alpine.data('watermark', () => ({
+        resting: false,
+        left: 0,
+        /** Column width in px; null falls back to the responsive class widths. */
+        width: null,
+
+        /** Left offset inside main's padding box, so resting and floating put
+           the drawing at the same x (column 1 starts after `px-4/6/8`). */
+        padLeft: 0,
+
+        /** Inline style for the two states; inline styles outrank classes. */
+        get pos() {
+          const size = this.width === null ? '' : `;width:${this.width}px`;
+          return this.resting
+            ? `position:absolute;left:${this.padLeft}px;bottom:1.5rem${size}`
+            : `position:fixed;left:${this.left}px;bottom:1.5rem${size}`;
+        },
+
+        init() {
+          const main = document.getElementById('main');
+          const footer = document.querySelector('.site-footer');
+          const probe = document.getElementById('watermark-probe');
+
+          // Fixed positioning is viewport-relative, so the page shell's left
+          // edge has to be measured — that keeps the image in line with the box.
+          // On wide screens the drawing fills column 1, read from the live grid
+          // (measuring beats duplicating Tailwind's column maths in JS).
+          const measure = () => {
+            if (getComputedStyle(main).display === 'grid') {
+              const box = main.getBoundingClientRect();
+              const column = probe.getBoundingClientRect();
+              this.left = Math.round(column.left);
+              this.width = Math.round(column.width);
+              this.padLeft = Math.round(column.left - box.left);
+            } else {
+              this.left = Math.round(main.getBoundingClientRect().left);
+              this.width = null;
+              this.padLeft = 0;
+            }
+          };
+
+          measure();
+          window.addEventListener('resize', measure);
+
+          // IntersectionObserver fires on entry and exit, so scrolling back down
+          // releases the image to the window bottom again.
+          new IntersectionObserver((entries) => {
+            this.resting = entries[0]?.isIntersecting ?? false;
+          }, { threshold: 0 }).observe(footer);
+        },
+      }));
+
+      Alpine.start();
+    </script>
   </body>
 </html>
