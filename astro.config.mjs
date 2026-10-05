@@ -133,7 +133,13 @@ export default defineConfig({
     plainSitemapFile(),
   ],
   vite: {
-    plugins: [tailwindcss()]
+    plugins: [tailwindcss()],
+    // glightbox is CommonJS, so the dev server has to prebundle it. Left out of
+    // `include`, Vite optimises it lazily and the page keeps requesting a stale
+    // `?v=` hash — the dev server answers 504, the Lightbox module never loads,
+    // and clicking a gallery tile falls through to the anchor's href (the browser
+    // opens the bare image). Naming it here prebundles it at startup.
+    optimizeDeps: { include: ['glightbox'] },
   },
   markdown: {
     processor: satteri({
