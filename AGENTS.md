@@ -2,13 +2,29 @@
 
 ## Development
 
-Start the dev server in background mode: `astro dev --background`
-(manage with `astro dev stop`, `astro dev status`, `astro dev logs`).
+All commands below are verified against this project (Astro 7.3.3). `astro` is not on
+`PATH`, so use the npm script or `npx` — a bare `astro dev` fails.
+
+```bash
+npm run dev -- --background        # background dev server (port 4321; falls back to
+                                   # the next free port, so read the URL it prints)
+npx astro dev status               # pid, uptime, "background" flag; nothing = not running
+npx astro dev logs [--follow]      # works only for a server started with --background;
+                                   # a foreground server logs in its own terminal
+npx astro dev stop                 # prints "Stopped dev server (pid N)"
+```
+
+After changing `src/content.config.ts` or frontmatter, restart with `--force` if the
+dev server serves stale content: `npx astro dev --background --force` (clears the
+content-layer cache).
 
 Verify work with `npm run build`, then check the rendered result by grepping
 `dist/**/*.html` for hrefs/classes, and `dist/_astro/*.css` for the media queries a
-breakpoint change produced. Avoid `npx astro check`: it prompts to install
-`@astrojs/check` interactively.
+breakpoint change produced. View the built site with `npm run preview` (foreground) or
+`npx astro preview --background` + `npx astro preview status|stop`. Preview lands on 4321
+only when no dev server is running — while one was up, preview took 4322 — so read the
+URL it prints.
+Avoid `npx astro check`: it prompts interactively to install `@astrojs/check`.
 
 ## Rules
 
