@@ -78,6 +78,14 @@ content:
         type: string
         required: false
 
+      # Optional per-image captions. One line per image, format:
+      # filename.jpg: Caption text shown in the lightbox and as alt text.
+      # Lines are parsed in Astro; empty lines are ignored.
+      - name: captions
+        label: "Image Captions (filename: caption)"
+        type: text
+        required: false
+
       # Embeds a generated block in the page: `people` renders one card per file
       # in src/content/people. Put `<!-- cards -->` on a line of its own where the
       # cards should appear (text above and below them is kept); leave it out and
@@ -133,6 +141,15 @@ content:
 
       - name: imageAlt
         label: Featured Image Alt Text
+        type: string
+        required: false
+
+      # Redirects the card on /impact: its image and title link here instead of to
+      # the post's own /impact/<slug> page. Accepts a full URL (https://…) or a site
+      # path (/documents/x.pdf); external URLs open in a new tab. The "Read more"
+      # CTA always leads to the post, so a redirected card still reaches its story.
+      - name: link
+        label: Card Link (URL or /documents/… path)
         type: string
         required: false
 
@@ -270,6 +287,13 @@ content:
     type: collection
     path: src/content/snippets
     fields:
+      # Optional label, shown in the CMS list only. The filename is what pages use
+      # (contact-form.md -> {{contact-form}), so this never appears on a page.
+      - name: title
+        label: Label (optional)
+        type: string
+        required: false
+
       - name: body
         label: HTML (inserted verbatim with {{name}})
         type: text
