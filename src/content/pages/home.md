@@ -2,7 +2,7 @@
 title: Pademelon Fund
 description: Supporting grassroots action for nature, First Nations and climate
   across Australia.
-heroImage: /images/pademelon-logo.png
+heroImage: /images/IMG_alpine.jpg
 heroAlt: Pademelon Fund logo
 layout: home
 ---
