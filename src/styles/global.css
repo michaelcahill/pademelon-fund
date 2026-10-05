@@ -157,6 +157,42 @@ main a {
   border: 1px solid rgba(255, 255, 255, 0.45);
 }
 
+/* Form fields (the contact-form snippet). Fields invert to a white surface with
+ * black ink — the same inversion as `.card`, because typed text has to read
+ * against the green canvas. Labels are plain white ink: they inherit from `body`,
+ * so the markup needs no colour classes of its own.
+ *
+ * Focus is a solid ring in the wordmark green, the site's one accent colour: it
+ * shows where the cursor is on a white field without needing ring utilities. */
+.field-label {
+  display: block;
+  margin-bottom: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.field {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background-color: #fff;
+  color: #000;
+  font-size: 0.875rem;
+}
+
+/* The message box keeps its own height and grows downwards, never sideways. */
+textarea.field {
+  min-height: 8rem;
+  resize: vertical;
+}
+
+.field:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
 /* Hairline separators on the green canvas (white, low opacity). */
 .hairline {
   border-top: 1px solid rgba(255, 255, 255, 0.2);
