@@ -1,6 +1,9 @@
 # build output
 dist/
 
+# originals kept by scripts/resize-images.sh before scaling
+scripts/.pre-resize-backup/
+
 # generated types
 .astro/
 
