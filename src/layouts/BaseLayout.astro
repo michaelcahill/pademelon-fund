@@ -100,10 +100,10 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin).hr
       <!-- Column probe: an empty grid item in column 1. The watermark measures
            its width so the drawing scales to the left column that the text
            columns leave free. It is zero-height, so it cannot shift content.
-           Below `lg` the grid is inert and the probe reports main's full content
+           Below `md` the grid is inert and the probe reports main's full content
            width — far too big for a phone — which `measure` ignores, leaving the
            responsive class widths below as the fallback. -->
-      <div id="watermark-probe" class="lg:col-span-1" aria-hidden="true"></div>
+      <div id="watermark-probe" class="md:col-span-1" aria-hidden="true"></div>
 
       <img
         src={withBase('/images/pademelon-outline.png')}
@@ -111,7 +111,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin).hr
         aria-hidden="true"
         x-data="watermark()"
         x-bind:style="pos"
-        class="pademelon-mark pointer-events-none absolute bottom-6 left-0 -z-10 w-24 sm:w-32 lg:w-40"
+        class="pademelon-mark pointer-events-none absolute bottom-6 left-0 -z-10 w-24 sm:w-32 md:w-40"
         decoding="async"
       />
 
