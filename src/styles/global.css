@@ -15,6 +15,10 @@
   --color-brand: #5f775e;
   --color-brand-dark: #4d614d;
 
+  /* Green colour scheme. `green-bg` is the page canvas every page shares.
+   * `green-light` is a tonal surface tint available for panels. */
+  --color-green-bg: #3d4746;
+
   /* Collapse the menu below 40rem. The seven short nav labels plus the wordmark
    * need roughly 40rem, which leaves comfortable room at this width; if labels
    * get longer, raise this rather than letting the bar wrap.
@@ -35,13 +39,171 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
+/* ---------------------------------------------------------------------------
+ * Colour scheme
+ *
+ * Appearance is driven from here, not from utility classes in components: the
+ * page canvas is green with white ink, and cards invert to black-on-white.
+ * Components keep their layout/spacing utilities (grid, padding, type scale)
+ * but carry no colour classes of their own — that keeps a palette change to a
+ * single file.
+ * ------------------------------------------------------------------------ */
+
+/* The page canvas: deep green with white ink. Everything inherits it. */
 body {
-  @apply bg-white text-slate-800 antialiased;
+  background-color: var(--color-green-bg);
+  color: #fff;
 }
 
-/* iOS Safari: `100vh` is the *large* viewport, which causes layout to jump as
- * the URL bar collapses. Prefer dvh for full-height regions.
+/* Links read as links on the green canvas: white. Underlines are opt-in — only
+ * page content gets them (see `main a` below); nav and footer link lists are
+ * chrome and stay clean. Cards override the colour to black (see `.card`).
+ *
+ * Written explicitly rather than relying on Tailwind's preflight
+ * (`text-decoration: inherit`) so the default is stated in this file.
  */
+a {
+  color: #fff;
+  text-decoration: none;
+  text-underline-offset: 2px;
+}
+
+/* Body links get the underline back: prose markdown, card "read more" and
+ * "back" links. `main` is the page content region in BaseLayout, so this can
+ * never reach header/footer links. `.btn` still wins (a class outranks `main a`
+ * on specificity), which keeps CTAs button-like.
+ */
+main a {
+  text-decoration: underline;
+}
+
+/* Cards invert: black ink on a white surface, sitting on the green page. The
+ * typography-plugin variables are re-pointed so markdown bios inside cards
+ * (PeopleGrid) match the card's own ink. */
+.card {
+  background-color: #fff;
+  color: #000;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+.card a {
+  color: #000;
+}
+
+.card .prose {
+  --tw-prose-body: #000;
+  --tw-prose-headings: #000;
+  --tw-prose-lead: #4b4b4b;
+  --tw-prose-links: #000;
+  --tw-prose-bold: #000;
+  --tw-prose-counters: #6b7280;
+  --tw-prose-bullets: #d1d5db;
+  --tw-prose-hr: #e5e7eb;
+  --tw-prose-quotes: #000;
+  --tw-prose-quote-borders: #e5e7eb;
+  --tw-prose-captions: #6b7280;
+  --tw-prose-code: #000;
+  --tw-prose-pre-code: #e5e7eb;
+  --tw-prose-pre-bg: #1f2937;
+  --tw-prose-th-borders: #d1d5db;
+  --tw-prose-td-borders: #e5e7eb;
+}
+
+/* Prose on the green canvas. The typography plugin colours everything through
+ * these variables, so overriding them here themes all content pages at once. */
+.prose {
+  --tw-prose-body: #fff;
+  --tw-prose-headings: #fff;
+  --tw-prose-lead: rgba(255, 255, 255, 0.85);
+  --tw-prose-links: #fff;
+  --tw-prose-bold: #fff;
+  --tw-prose-counters: rgba(255, 255, 255, 0.75);
+  --tw-prose-bullets: rgba(255, 255, 255, 0.45);
+  --tw-prose-hr: rgba(255, 255, 255, 0.25);
+  --tw-prose-quotes: #fff;
+  --tw-prose-quote-borders: rgba(255, 255, 255, 0.35);
+  --tw-prose-captions: rgba(255, 255, 255, 0.75);
+  --tw-prose-code: #fff;
+  --tw-prose-pre-code: #fff;
+  --tw-prose-pre-bg: rgba(0, 0, 0, 0.45);
+  --tw-prose-th-borders: rgba(255, 255, 255, 0.35);
+  --tw-prose-td-borders: rgba(255, 255, 255, 0.25);
+}
+
+/* Buttons (home-page CTAs). Underlines are suppressed so a button reads as a
+ * button, not a link. */
+.btn {
+  text-decoration: none;
+  border-radius: 0.5rem;
+}
+
+.btn-primary {
+  background-color: #fff;
+  color: var(--color-green-bg);
+}
+
+.btn-secondary {
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+}
+
+/* Hairline separators on the green canvas (white, low opacity). */
+.hairline {
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Pademelon watermark (positioned in BaseLayout). The source is black line art
+ * with soft alpha, so on the green canvas it reads as a faint dark drawing.
+ * Opacity is appearance, so it stays here with the palette: kept low enough
+ * that white body text over it keeps its contrast. Not selectable — it is
+ * decoration, not content. */
+.pademelon-mark {
+  opacity: 0.35;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Gallery tiles: a framed thumbnail on the green canvas. */
+.tile {
+  background-color: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 0.5rem;
+}
+
+.tile:hover {
+  border-color: #fff;
+}
+
+/* Gallery empty state: same inverted surface as a card. */
+.empty {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px dashed rgba(255, 255, 255, 0.4);
+  border-radius: 0.5rem;
+}
+
+/* Header / footer chrome. Widths come from SHELL_CONTAINER (src/lib/shell.ts)
+ * and are identical on every page, so the nav bar never resizes as you move
+ * between text and gallery pages. */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background-color: rgba(61, 71, 70, 0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  /* Respect the iPhone notch / status bar when the header is stuck to the top. */
+  padding-top: env(safe-area-inset-top);
+}
+
+.site-footer {
+  margin-top: auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Stop iOS Safari inflating text after a device rotation. */
 .min-h-screen-safe {
   min-height: 100dvh;
 }
@@ -50,21 +212,7 @@ body {
 a,
 button {
   -webkit-tap-highlight-color: transparent;
-  @apply touch-manipulation;
-}
-
-/* Header / footer chrome. Widths come from SHELL_CONTAINER (src/lib/shell.ts)
- * and are identical on every page, so the nav bar never resizes as you move
- * between text and gallery pages. */
-.site-header {
-  @apply sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur;
-  /* Respect the iPhone notch / status bar when the header is stuck to the top. */
-  padding-top: env(safe-area-inset-top);
-}
-
-.site-footer {
-  @apply mt-auto border-t border-slate-200 bg-slate-50;
-  padding-bottom: env(safe-area-inset-bottom);
+  touch-action: manipulation;
 }
 
 /* ---------------------------------------------------------------------------
@@ -158,14 +306,15 @@ html.js .nav-panel:not([data-open="true"]) {
  * cases it cannot know about (wide media, iPhone overflow).
  * ------------------------------------------------------------------------ */
 .prose img {
-  @apply h-auto rounded-lg;
+  border-radius: 0.5rem;
+  height: auto;
   max-width: 100%;
 }
 
 /* Long code lines and tables must not force the page to scroll sideways. */
 .prose pre,
 .prose table {
-  @apply overflow-x-auto;
+  overflow-x: auto;
   max-width: 100%;
 }
 
