@@ -32,38 +32,37 @@ hero and the lightbox sharp.
 hero box itself the mean per-channel difference vs a lossless resize is ~3–4/255 — JPEG
 re-encode noise, no geometry change.
 
-**Keep the width, re-encode only.** Already at or below 1664: `IMG_alpine.jpg` (home
-hero, 1600), `WhatsApp Image …jpeg` (about hero, 1600), `michael-cahill.jpg` (1087),
-the four unreferenced 1280 JPEGs, `still life in desert.jpeg` (960). Re-encoding at
-quality 82 halves their bytes without touching pixels (RMSE 2–6/255).
+**Keep the width, re-encode only.** Already at or below 1664: `alpine.jpg` (home hero,
+1600), `michael-cahill.jpg` (1087), the unreferenced 1280 JPEGs
+(`about-page-photo.jpeg`, `cradlemountain.jpeg`, `mcdonnell-ranges.jpeg`) and
+`still-life-in-desert.jpeg` (960). Re-encoding at quality 82 halves their bytes without
+touching pixels (RMSE 2–6/255).
 
 **Never scale.** `pademelon-outline.png` (229×442) is drawn ~261 CSS px wide × 2 = 522px,
 so it is already upscaled — shrinking blurs the watermark. `philanthropy-aus.png` (100px
 tall) is shown in an 80 CSS px box = 160 device px, also already short.
-`rachel-honnery.jpg` (800²) sits exactly on the portrait limit. `IMG_flowers.jpg`
+`rachel-honnery.jpg` (800²) sits exactly on the portrait limit. `flowers.jpg`
 (441×385) is below the impact card's 808px need and is upscaled today — there is no larger
 copy of that photo, so it cannot be improved by resizing. The transparent
 PNGs (`pademelon-outline.png`, `pademelon-logo-small.png`, `favicon.png`) must stay PNG —
 they are line art, and JPEG destroys the alpha (RMSE 24–33/255).
 
-**Format change, biggest single wins — done.** `IMG_flowers.png` (294 KB) and
-`rachel-honnery.png` (627 KB) were fully-opaque photos in a PNG wrapper (alpha min 255 on
-every pixel), so they became JPEGs at the same dimensions: 32 KB and 62 KB, RMSE 3.6 and
-2.09 / 255 against the PNG. The frontmatter that pointed at `IMG_flowers.png` now points at
-the `.jpg`; the portrait needs no frontmatter because `PORTRAIT_EXT` in `src/lib/people.ts`
-lists `.jpg` first, and the `.png` was deleted so there is no ambiguity.
+**Format change, biggest single wins — done.** The flowers photo (294 KB) and Rachel's
+portrait (627 KB) were fully-opaque photos in a PNG wrapper (alpha min 255 on every pixel),
+so they became JPEGs at the same dimensions: 32 KB and 62 KB, RMSE 3.6 and 2.09 / 255
+against the PNG. The portrait needs no frontmatter because `PORTRAIT_EXT` in
+`src/lib/people.ts` lists `.jpg` first, and the `.png` was deleted so there is no ambiguity.
 
-**Duplicates — done.** `IMG_pademelon.jpg` ≡ `pademelon_photos/IMG_pademelon.jpg` and
-`IMG_R&M mountain.jpg` ≡ `pademelon_photos/IMG_R&M mountain.jpg` (identical md5) — 2.9 MB
-of pure duplication. The **top-level** copies are the ones kept: frontmatter heroes live at
-`/images/<file>` and galleries live in folders, so removing the folder copies keeps a hero
-from being repeated as a gallery tile on the same page.
+**Duplicates — done.** The pademelon and mountain photos existed twice (identical md5) —
+once at top level as a hero, once inside the photo folder. The **top-level** copies are the
+ones kept: frontmatter heroes live at `/images/<file>` and galleries live in folders, so
+dropping the folder copies keeps a hero from being repeated as a gallery tile on the same page.
 
-**Currently rendered nowhere.** `pademelon_photos/` (17 files, 21 MB) matches no entry
-slug and no `gallery:` field, so it is the "future gallery": wiring it up needs only
-`gallery: pademelon_photos` in frontmatter. Also unreferenced: `About page photo.jpeg`,
-`Cradlemountain.jpeg`, `McDonnell Ranges.jpeg`, `still life in desert.jpeg`,
-`pademelon-logo.png`. `public/images/about/` is empty while
+**Currently rendered nowhere.** `pademelon-photos/` (15 files) matches no entry slug and no
+`gallery:` field, so it is the "future gallery": wiring it up needs only
+`gallery: pademelon-photos` in frontmatter. Also unreferenced: `cradlemountain.jpeg`,
+`mcdonnell-ranges.jpeg`, `still-life-in-desert.jpeg`, `pademelon-logo.png`.
+`public/images/about/` is empty while
 `src/content/impact/welcome-to-pademelon-fund.md` sets `gallery: about`, so that post
 renders the "no images in this gallery yet" notice today.
 
@@ -78,24 +77,48 @@ The script caps **width** (`-resize 1664x`), not the long edge: portrait origina
 stored rotated (EXIF Orientation 6 on 12 of them), and `-auto-orient` bakes that rotation
 into the pixels before `-strip` removes the metadata, so they look exactly as they do now.
 Capping by long edge would leave portrait photos 1248 wide — soft in a Retina hero.
-Filenames are unchanged, so frontmatter paths and Pages CMS media references keep working.
-Backups mirror the `public/images` tree and live **outside** `public/`: Astro copies
-everything under `public/` into `dist`, so a backup folder there ships the originals.
+Filenames are unchanged by the resize, so frontmatter paths and Pages CMS media references
+keep working. Backups mirror the `public/images` tree and live **outside** `public/`: Astro
+copies everything under `public/` into `dist`, so a backup folder there ships the originals.
 
-Gallery-only folders can go smaller (tiles need ~534px): `pademelon_photos/` at 1280 is
+Gallery-only folders can go smaller (tiles need ~534px): `pademelon-photos/` at 1280 is
 5.4 MB, versus 9.7 MB at 1664 — the saving costs nothing on screen for tiles, but the
 lightbox loses headroom.
+
+## Renaming pass
+
+`scripts/rename-images.sh` renames every photo to a URL-friendly slug: drop the `IMG_`
+prefix, spaces and underscores → dashes, all lowercase. It uses `git mv`, refuses to
+clobber an existing name, and is idempotent (a re-run reports "already renamed").
+
+- `IMG_R&M mountain.jpg` → `r-and-m-mountain.jpg`. The `&` is the one character worth
+  removing: it survives in a URL path, but HTML has to escape it (`src="/images/IMG_R&amp;M
+  mountain.jpg"`), which is exactly the kind of thing that breaks when a path is copied
+  between frontmatter, the CMS and a browser.
+- `Cradlemountain.jpeg` → `cradlemountain.jpeg` is a case-only rename, invisible on the
+  case-insensitive macOS filesystem: `git mv` sees a collision, so the script goes through
+  a temporary name.
+- The gallery folder follows the same rule: `pademelon_photos/` → `pademelon-photos/`.
+  Nothing referenced it, and `titleFromFilename()` in `src/lib/galleries.ts` turns dashes
+  back into spaces, so tiles read "Evening treecover" rather than "IMG_evening treecover".
+
+Pages CMS uploads keep their original names (`input: public/images`), so a future upload
+can reintroduce a space or an `IMG_` prefix. Re-run the script, then update any frontmatter
+that pointed at a renamed file.
 
 ## Applied (2026-10-05)
 
 **Scale-down.** 26 JPEGs changed: 19 scaled to 1664 wide, 7 re-encoded at width ≤ 1664 with
 pixels untouched. `public/images` 30 MB → 20 MB, `dist/images` 38 MB → 20 MB.
 
-**Dedupe + format.** Two duplicate JPEGs removed from `pademelon_photos/`, and the two
-opaque photo PNGs converted to JPEG (924 KB of PNG → 94 KB). `public/images` is now 17 MB
-(from 30 MB), and `dist/images` matches it.
-Four filenames changed, so one frontmatter path was edited (`IMG_flowers.jpg`) and one
-portrait resolves by convention (`people/rachel-honnery.jpg`).
+**Dedupe + format.** Two duplicate JPEGs removed from the photo folder, and the two opaque
+photo PNGs converted to JPEG (924 KB of PNG → 94 KB). `public/images` is now 17 MB
+(from 30 MB), and `dist/images` matches it. One frontmatter path was edited (`flowers.jpg`);
+the portrait resolves by convention (`people/rachel-honnery.jpg`).
+
+**Rename.** 23 files + the photo folder renamed (see "Renaming pass"), with five frontmatter
+paths updated: home `alpine.jpg`, about `about-page-photo.jpeg`, contact
+`r-and-m-mountain.jpg`, impact cards `pademelon.jpg` / `flowers.jpg`.
 
 Checked after applying:
 
@@ -104,9 +127,10 @@ Checked after applying:
   only re-encode noise.
 - Widest JPEG in `public/images` is now 1664px, so no hero is upscaled beyond Retina size.
 - `npm run build` clean (9 pages); every `src` in the built HTML points at a file that
-  exists — home `IMG_alpine.jpg`, about `About page photo.jpeg`, contact
-  `IMG_R&M mountain.jpg`, impact cards `IMG_pademelon.jpg` / `IMG_flowers.jpg`, portraits
-  `people/michael-cahill.jpg` / `people/rachel-honnery.jpg`.
+  exists — home `alpine.jpg`, about `about-page-photo.jpeg`, contact
+  `r-and-m-mountain.jpg`, impact cards `pademelon.jpg` / `flowers.jpg`, portraits
+  `people/michael-cahill.jpg` / `people/rachel-honnery.jpg`, and the chrome images
+  `pademelon-logo-small.png` / `pademelon-outline.png`.
 - Preview server served the new bytes: home hero 442 KB, about hero 347 KB, contact hero
   586 KB (were 873 / 525 / 1618 KB), and `dist` contains no backup folder.
 
