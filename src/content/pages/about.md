@@ -2,7 +2,7 @@
 title: About us
 description: How the Pademelon Fund works, and the AEGN Nature Funding Framework
   we use to decide who to support.
-heroImage: /images/WhatsApp Image 2026-10-05 at 17.53.43.jpeg
+heroImage: /images/About page photo.jpeg
 ---
 ## Our Mission
 
