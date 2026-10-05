@@ -1,6 +1,8 @@
 ---
 title: About us
-description: How the Pademelon Fund works, and the AEGN Nature Funding Framework we use to decide who to support.
+description: How the Pademelon Fund works, and the AEGN Nature Funding Framework
+  we use to decide who to support.
+heroImage: /images/WhatsApp Image 2026-10-05 at 17.53.43.jpeg
 ---
 ## Our Mission
 
@@ -14,7 +16,7 @@ We are a small, independent fund with a **collaborative** mindset to environment
 
 We use the AEGN’s *Nature Funding Framework* to help decide who we support. This framework includes the **7 levers for change**, which breaks down strategic philanthropy into 7 categories:
 
-1. Applied Conservation 
+1. Applied Conservation
 2. Legal
 3. Science, Research and Monitoring
 4. Communication and Education
