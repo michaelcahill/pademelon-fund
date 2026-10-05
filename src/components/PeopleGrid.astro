@@ -42,14 +42,34 @@ const gridClass =
         <ul class:list={["mt-6 grid gap-6", gridClass]}>
             {cards.map(({ person, Content }) => (
                 <li class="card flex flex-col">
+                    <!-- The portrait links to the person's site when they have one,
+                         matching the partner cards (partners.astro). No link means
+                         the portrait stays a plain image. -->
                     {portraitFor(person) ? (
-                        <img
-                            src={portraitFor(person)}
-                            alt={person.data.imageAlt ?? person.data.name}
-                            class="aspect-square w-full object-cover"
-                            loading="lazy"
-                            decoding="async"
-                        />
+                        person.data.link ? (
+                            <a
+                                href={person.data.link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="block"
+                            >
+                                <img
+                                    src={portraitFor(person)}
+                                    alt={person.data.imageAlt ?? person.data.name}
+                                    class="aspect-square w-full object-cover"
+                                    loading="lazy"
+                                    decoding="async"
+                                />
+                            </a>
+                        ) : (
+                            <img
+                                src={portraitFor(person)}
+                                alt={person.data.imageAlt ?? person.data.name}
+                                class="aspect-square w-full object-cover"
+                                loading="lazy"
+                                decoding="async"
+                            />
+                        )
                     ) : null}
 
                     <div class="flex grow flex-col p-6">
