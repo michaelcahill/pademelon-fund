@@ -7,6 +7,14 @@
  */
 @plugin "@tailwindcss/typography";
 
+/* Parallax transform driven by Alpine's `--bg-y` custom property. Reading a
+ * CSS variable inside `transform` keeps updates on the compositor — no layout
+ * thrash when the scroll handler writes `--bg-y` at 60fps.
+ */
+@utility parallax-bg {
+  transform: translateY(calc(var(--bg-y, 0px) * 0.35));
+}
+
 @theme {
   /* Wordmark green, sampled from the logo. `brand-dark` is a darker step of the
    * same hue and saturation for hover states (6.7:1 on white vs 4.9:1 here).
