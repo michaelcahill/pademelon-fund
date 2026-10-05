@@ -100,6 +100,18 @@ main a {
   color: #000;
 }
 
+/* Card `h3` — the secondary line, a person's role or a markdown sub-heading — takes
+ * the page's own green (`--color-green-bg`, the canvas colour) as an accent on the
+ * white card, keeping the palette to one hue. At 9.5:1 on white it stays readable at
+ * the small uppercase size PeopleGrid uses.
+ *
+ * Written as `.card h3` (0,1,1) so it outranks the typography plugin's heading rule
+ * inside prose, whose `:where()` selector adds no specificity. Re-pointing
+ * `--tw-prose-headings` would recolour every heading level, not just `h3`. */
+.card h3 {
+  color: var(--color-green-bg);
+}
+
 .card .prose {
   --tw-prose-body: #000;
   --tw-prose-headings: #000;
