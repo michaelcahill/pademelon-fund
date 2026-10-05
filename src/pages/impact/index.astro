@@ -36,16 +36,34 @@ const description =
         {impactPosts.map((post) => {
           const photoCount = countGalleryImages(galleryFolderFor(post.data, post.id));
 
+          // Frontmatter `link` redirects the image and title — to an outside page, or
+          // to a site path such as /documents/x.pdf. The story keeps its own
+          // /impact/<slug> URL and the "Read more" CTA always goes there, so a
+          // redirected card still leads to the post. Site paths get the base path
+          // added; only true external URLs open in a new tab.
+          const link = post.data.link;
+          const isExternal = !!link && /^https?:\/\//.test(link);
+          const storyHref = withBase(`/impact/${post.id}`);
+          const href = link ? withBase(link) : storyHref;
+          const externalAttrs = isExternal
+            ? { target: '_blank', rel: 'noopener noreferrer' }
+            : {};
+
           return (
             <li class="card flex flex-col">
+              <!-- The image is a link to the card's destination: frontmatter `link`
+                   when set, otherwise the story page. Same href as the title below;
+                   the CTA at the end of the card always goes to the story. -->
               {post.data.image ? (
-                <img
-                  src={withBase(post.data.image)}
-                  alt={post.data.imageAlt ?? ''}
-                  class="aspect-[16/9] w-full object-cover"
-                  loading="lazy"
-                  decoding="async"
-                />
+                <a href={href} {...externalAttrs} class="block">
+                  <img
+                    src={withBase(post.data.image)}
+                    alt={post.data.imageAlt ?? ''}
+                    class="aspect-[16/9] w-full object-cover"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </a>
               ) : null}
 
               <div class="flex flex-grow flex-col p-5">
@@ -57,7 +75,7 @@ const description =
                 </time>
 
                 <h2 class="mt-2 text-lg font-bold leading-snug">
-                  <a href={withBase(`/impact/${post.id}`)}>
+                  <a href={href} {...externalAttrs}>
                     {post.data.title}
                   </a>
                 </h2>
@@ -68,7 +86,7 @@ const description =
 
                 <div class="mt-4 flex items-center gap-3 text-xs font-medium">
                   <a
-                    href={withBase(`/impact/${post.id}`)}
+                    href={storyHref}
                     class="inline-flex min-h-11 items-center"
                   >
                     Read more &rarr;

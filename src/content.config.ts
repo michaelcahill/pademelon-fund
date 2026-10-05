@@ -60,6 +60,14 @@ const impact = defineCollection({
     /** Featured image, shown at the top of the post. */
     image: z.string().optional(),
     imageAlt: z.string().optional(),
+    /**
+     * Full URL (https://…) or site-absolute path (/documents/x.pdf). When set, the
+     * card's image and title send readers here instead of to the post's own
+     * /impact/<slug> page, which stays available at its URL — the "Read more" CTA
+     * always leads there. External URLs open in a new tab. Same field as the people
+     * cards (PeopleGrid.astro) and the partner logos (partners.astro).
+     */
+    link: z.string().optional(),
     ...galleryFields,
   }),
 });
