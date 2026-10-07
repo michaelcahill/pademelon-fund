@@ -66,10 +66,17 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin).hr
 
     <Nav />
 
+    <!-- `content-start` (align-content) pins the rows to the top of main.
+         Without it the default `align-content: normal` behaves as `stretch`,
+         and because every row here is auto-sized, the free space in a tall
+         window is shared between them — each grid item's row grows and the
+         page visibly spreads down the screen. Stretching main (flex-grow) is
+         what keeps the footer at the bottom; this keeps the content at the
+         top and puts all the leftover room below it. -->
     <main
       id="main"
       class:list={[
-        'relative flex-grow py-10 sm:py-12',
+        'relative flex-grow content-start py-10 sm:py-12',
         SHELL_CONTAINER,
         SHELL_GRID,
       ]}
