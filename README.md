@@ -82,12 +82,12 @@ Which layout an entry uses is decided by `pickLayout()` in `src/lib/layouts.ts`:
 
 ## Galleries
 
-A gallery is just a **folder of images** in `public/images/`. Nothing to
+A gallery is just a **folder of images** in `src/assets/images/`. Nothing to
 register: by convention an entry uses the folder named after it, so
-`src/content/pages/impact.md` reads `public/images/impact/`.
+`src/content/pages/impact.md` reads `src/assets/images/impact/`.
 
 - **Different folder?** Set `gallery:` in frontmatter — any directory under
-  `public/images/` works, and several entries may share one
+  `src/assets/images/` works, and several entries may share one
   (`gallery: about`).
 - **Order:** images are sorted by filename using natural order, so prefix them
   (`01-arrival.jpg`, `02-camp.jpg`) to control the sequence.
@@ -213,7 +213,7 @@ Jane Doe …bio paragraph…
 ```
 
 The portrait follows the gallery convention: drop
-`public/images/people/jane-doe.jpg` (matching the filename) and it is picked up
+`src/assets/images/people/jane-doe.jpg` (matching the filename) and it is picked up
 automatically, or set `image:` explicitly. Bios are plain prose — paragraphs,
 lists and links work; keep headings out, as the card supplies the name.
 

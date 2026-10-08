@@ -1,24 +1,24 @@
 ---
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { withBase } from '../lib/paths';
+import { photoFor } from '../lib/photos';
 import { FULL_WIDTH } from '../lib/shell';
 
 interface Partner {
   name: string;
   description?: string;
-  /** Site-absolute path, e.g. /images/partners/nic.png */
-  logo?: string;
+  /** Logo path in content (`/images/partners/nic.png`) resolved by `photoFor()`. */
+  logo?: ImageMetadata;
   /** Optional organisation website. */
   link?: string;
   order?: number;
 }
 
-const partners = (
-  await getCollection('partners')
-)
+const partners: Partner[] = (await getCollection('partners'))
   .sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
-  .map((p) => p.data);
+  .map((p) => ({ ...p.data, logo: photoFor(p.data.logo) }));
 ---
 
 <BaseLayout
@@ -49,19 +49,23 @@ const partners = (
               rel="noopener noreferrer"
               class="inline-flex"
             >
-              <img
-                src={withBase(partner.logo)}
+              <Image
+                src={partner.logo!}
                 alt={partner.name}
-                class="h-20 w-full object-contain"
+                format="webp"
+                loading="lazy"
                 decoding="async"
+                class="h-20 w-full object-contain"
               />
             </a>
           ) : (
-            <img
-              src={withBase(partner.logo)}
+            <Image
+              src={partner.logo!}
               alt={partner.name}
-              class="h-20 w-full object-contain"
+              format="webp"
+              loading="lazy"
               decoding="async"
+              class="h-20 w-full object-contain"
             />
           )
         ) : (

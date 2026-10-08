@@ -1,8 +1,9 @@
 ---
+import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { countGalleryImages, galleryFolderFor } from '../../lib/galleries';
 import { isDocumentPath } from '../../lib/documents';
+import { CARD_WIDTHS, countGalleryImages, galleryFolderFor, photoFor } from '../../lib/photos';
 import { withBase } from '../../lib/paths';
 import { FULL_WIDTH } from '../../lib/shell';
 
@@ -61,11 +62,13 @@ const description =
               <!-- The image is a link to the card's destination: frontmatter `link`
                    when set, otherwise the story page. Same href as the title below;
                    the CTA at the end of the card always goes to the story. -->
-              {post.data.image ? (
+              {photoFor(post.data.image) ? (
                 <a href={href} {...externalAttrs} {...prefetchAttrs} class="block">
-                  <img
-                    src={withBase(post.data.image)}
+                  <Image
+                    src={photoFor(post.data.image)!}
                     alt={post.data.imageAlt ?? ''}
+                    widths={CARD_WIDTHS}
+                    format="webp"
                     class="aspect-[16/9] w-full object-cover"
                     loading="lazy"
                     decoding="async"

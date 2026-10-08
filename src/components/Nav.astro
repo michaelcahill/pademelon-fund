@@ -1,6 +1,9 @@
 ---
 import { isActive, navItems, homeHref } from "../lib/navigation";
 import { SHELL_CONTAINER } from "../lib/shell";
+// Imported so Astro fingerprints the file (it is no longer served from public/);
+// an image import gives metadata, so the URL is `logo.src`.
+import logo from "../assets/images/pademelon-logo-small.png";
 
 const currentPath = Astro.url.pathname;
 ---
@@ -17,7 +20,7 @@ const currentPath = Astro.url.pathname;
             class="flex shrink-0 items-center gap-1 text-lg font-bold"
         >
             <img
-                src="/images/pademelon-logo-small.png"
+                src={logo.src}
                 alt="Pademelon Fund logo"
                 width={64}
                 height={64}

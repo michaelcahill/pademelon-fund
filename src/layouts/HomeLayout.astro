@@ -1,7 +1,9 @@
 ---
+import type { ImageMetadata } from "astro";
+import { Image } from "astro:assets";
 import BaseLayout from "./BaseLayout.astro";
 import { FULL_GRID, FULL_WIDTH, TEXT_COLUMN } from "../lib/shell";
-import { withBase } from "../lib/paths";
+import { HERO_WIDTHS } from "../lib/photos";
 
 interface CallToAction {
     href: string;
@@ -12,8 +14,8 @@ interface Props {
     title: string;
     /** Lead paragraph under the headline. */
     description?: string;
-    /** Site-absolute path, e.g. `/images/about/team.jpg` (frontmatter style). */
-    heroImage?: string;
+    /** Photo resolved by `photoFor()` — Astro builds the srcset at build time. */
+    heroImage?: ImageMetadata;
     heroAlt?: string;
     /** First is rendered as the primary button; any second one is secondary. */
     ctas?: CallToAction[];
@@ -52,15 +54,17 @@ const { title, description, heroImage, heroAlt, ctas = [] } = Astro.props;
             ) : null}
 
             {heroImage ? (
-                <img
-                    src={withBase(heroImage)}
+                // Full width, cropped to 16:9 — matches the aspect ratio used by
+                // gallery tiles. `object-cover` fills the box and crops the
+                // overflow so the hero is a clean landscape strip.
+                <Image
+                    src={heroImage}
                     alt={heroAlt ?? ""}
-                    // Full width, cropped to 16:9 — matches the aspect ratio
-                    // used by gallery tiles. `object-cover` fills the box and
-                    // crops the overflow so the hero is a clean landscape strip.
-                    class="w-full aspect-[16/9] rounded-xl object-cover sm:rounded-2xl"
+                    widths={HERO_WIDTHS}
+                    format="webp"
+                    loading="eager"
                     decoding="async"
-                    fetchpriority="high"
+                    class="w-full aspect-[16/9] rounded-xl object-cover sm:rounded-2xl"
                 />
             ) : null}
         </section>

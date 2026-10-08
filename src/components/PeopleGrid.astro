@@ -1,5 +1,7 @@
 ---
+import { Image } from "astro:assets";
 import { render } from "astro:content";
+import { CARD_WIDTHS } from "../lib/photos";
 import { getPeople, portraitFor, type Person } from "../lib/people";
 
 interface Props {
@@ -53,18 +55,22 @@ const gridClass =
                                 rel="noopener noreferrer"
                                 class="block"
                             >
-                                <img
-                                    src={portraitFor(person)}
+                                <Image
+                                    src={portraitFor(person)!}
                                     alt={person.data.imageAlt ?? person.data.name}
+                                    widths={CARD_WIDTHS}
+                                    format="webp"
                                     class="aspect-square w-full object-cover"
                                     loading="lazy"
                                     decoding="async"
                                 />
                             </a>
                         ) : (
-                            <img
-                                src={portraitFor(person)}
+                            <Image
+                                src={portraitFor(person)!}
                                 alt={person.data.imageAlt ?? person.data.name}
+                                widths={CARD_WIDTHS}
+                                format="webp"
                                 class="aspect-square w-full object-cover"
                                 loading="lazy"
                                 decoding="async"

@@ -1,7 +1,13 @@
-# Image size audit — `public/images/`
+# Image size audit — `src/assets/images/`
 
-Measured against how the site actually displays images (Astro copies `public/` to
-`dist/` verbatim, so nothing is optimised at build time — a static resize is the only lever).
+Photos live in `src/assets/images/`, so Astro's image service (`sharp`) resizes them at
+build time: `<Image>` writes a `srcset` of WebP renditions at the widths each context
+displays at, and `photoFor()` in `src/lib/photos.ts` resolves the `/images/<file>` paths
+that frontmatter and the CMS write. Measured against how the site displays images.
+
+The static resize (`scripts/resize-images.sh`) is still the lever for **source quality**:
+Astro scales down from whatever is uploaded, so a 4032px original re-encoded at quality 82
+gives it better pixels to work with than a raw camera file, and the source tree stays small.
 
 ## The width that matters
 
@@ -18,7 +24,7 @@ target width for anything used as a hero.
 | People portrait | `PeopleGrid.astro` — `aspect-square w-full`, 2-up | 404px | 808px |
 | Gallery tile (3-up at `md`) | `GalleryGrid.astro` — `grid-cols-2 md:grid-cols-3`, `gap-4` | 267px | 534px |
 | Partner logo | `partners.astro` — `h-20 w-full object-contain` | 80px tall | ≥160px tall |
-| Pademelon watermark | `BaseLayout.astro` — Alpine sets width to column 1 (≈261 CSS px) | ~261px | 522px |
+| Pademelon watermark | `Watermark.astro` — the script sets width to column 1 (≈261 CSS px) | ~261px | 522px |
 
 The lightbox (`Lightbox.astro`, glightbox) loads the tile's `href` — the same file, no
 srcset — so a gallery photo is shown at its native size, capped by the viewport. A
@@ -62,7 +68,7 @@ dropping the folder copies keeps a hero from being repeated as a gallery tile on
 `gallery:` field, so it is the "future gallery": wiring it up needs only
 `gallery: pademelon-photos` in frontmatter. Also unreferenced: `cradlemountain.jpeg`,
 `mcdonnell-ranges.jpeg`, `still-life-in-desert.jpeg`, `pademelon-logo.png`.
-`public/images/about/` is empty while
+`src/assets/images/about/` is empty while
 `src/content/impact/welcome-to-pademelon-fund.md` sets `gallery: about`, so that post
 renders the "no images in this gallery yet" notice today.
 
@@ -78,8 +84,9 @@ stored rotated (EXIF Orientation 6 on 12 of them), and `-auto-orient` bakes that
 into the pixels before `-strip` removes the metadata, so they look exactly as they do now.
 Capping by long edge would leave portrait photos 1248 wide — soft in a Retina hero.
 Filenames are unchanged by the resize, so frontmatter paths and Pages CMS media references
-keep working. Backups mirror the `public/images` tree and live **outside** `public/`: Astro
-copies everything under `public/` into `dist`, so a backup folder there ships the originals.
+keep working. Backups mirror the `src/assets/images` tree and live **outside** it
+(`scripts/.pre-resize-backup`): `photoFor()` globs every photo under `src/assets/images`,
+so a `.bak` copy in that tree would be treated as a picture.
 
 Gallery-only folders can go smaller (tiles need ~534px): `pademelon-photos/` at 1280 is
 5.4 MB, versus 9.7 MB at 1664 — the saving costs nothing on screen for tiles, but the
@@ -99,20 +106,20 @@ clobber an existing name, and is idempotent (a re-run reports "already renamed")
   case-insensitive macOS filesystem: `git mv` sees a collision, so the script goes through
   a temporary name.
 - The gallery folder follows the same rule: `pademelon_photos/` → `pademelon-photos/`.
-  Nothing referenced it, and `titleFromFilename()` in `src/lib/galleries.ts` turns dashes
+  Nothing referenced it, and `titleFromFilename()` in `src/lib/photos.ts` turns dashes
   back into spaces, so tiles read "Evening treecover" rather than "IMG_evening treecover".
 
-Pages CMS uploads keep their original names (`input: public/images`), so a future upload
+Pages CMS uploads keep their original names (`input: src/assets/images`), so a future upload
 can reintroduce a space or an `IMG_` prefix. Re-run the script, then update any frontmatter
 that pointed at a renamed file.
 
 ## Applied (2026-10-05)
 
 **Scale-down.** 26 JPEGs changed: 19 scaled to 1664 wide, 7 re-encoded at width ≤ 1664 with
-pixels untouched. `public/images` 30 MB → 20 MB, `dist/images` 38 MB → 20 MB.
+pixels untouched. `src/assets/images` 30 MB → 20 MB, `dist/images` 38 MB → 20 MB.
 
 **Dedupe + format.** Two duplicate JPEGs removed from the photo folder, and the two opaque
-photo PNGs converted to JPEG (924 KB of PNG → 94 KB). `public/images` is now 17 MB
+photo PNGs converted to JPEG (924 KB of PNG → 94 KB). `src/assets/images` is now 17 MB
 (from 30 MB), and `dist/images` matches it. One frontmatter path was edited (`flowers.jpg`);
 the portrait resolves by convention (`people/rachel-honnery.jpg`).
 
@@ -125,7 +132,7 @@ Checked after applying:
 - Every file compared against the **browser view of the original** (EXIF rotation applied):
   mean per-channel RMSE 0.97–4.24 / 255, nothing above 8 — rotation and framing preserved,
   only re-encode noise.
-- Widest JPEG in `public/images` is now 1664px, so no hero is upscaled beyond Retina size.
+- Widest JPEG in `src/assets/images` is now 1664px, so no hero is upscaled beyond Retina size.
 - `npm run build` clean (9 pages); every `src` in the built HTML points at a file that
   exists — home `alpine.jpg`, about `about-page-photo.jpeg`, contact
   `r-and-m-mountain.jpg`, impact cards `pademelon.jpg` / `flowers.jpg`, portraits

@@ -1,8 +1,12 @@
 # Media upload destinations.
 #
-# Two named sources: images go to public/images; downloadable files (PDFs,
-# spreadsheets, decks, ZIPs) go to public/documents. Files are served verbatim
-# from their `output` path, so an uploaded `grant-rules.pdf` is reachable at
+# Two named sources: images go to src/assets/images; downloadable files (PDFs,
+# spreadsheets, decks, ZIPs) go to public/documents.
+#
+# Photos live under `src/` so Astro's image service can resize them at build time
+# (`<Image>` builds a srcset of WebP renditions); uploads keep the `/images/…` shape
+# below, which src/lib/photos.ts resolves to the built asset. Documents are served
+# verbatim from their `output` path, so an uploaded `grant-rules.pdf` is reachable at
 # /documents/grant-rules.pdf and can be linked from any page or impact body:
 #
 #   [Grant rules](/documents/grant-rules.pdf)
@@ -16,7 +20,9 @@
 media:
   - name: images
     label: Images
-    input: public/images
+    # Under src/, so Astro optimises them; the value written into content stays
+    # `/images/<file>` and src/lib/photos.ts resolves it to the built asset.
+    input: src/assets/images
     output: /images
     categories: [image]
 
@@ -65,7 +71,7 @@ content:
         type: string
         required: false
 
-      # Folder inside public/images holding this page's gallery images.
+      # Folder inside src/assets/images holding this page's gallery images.
       # Leave blank to use a folder named after the page.
       - name: gallery
         label: Gallery Folder (optional)
@@ -159,7 +165,7 @@ content:
         type: string
         required: false
 
-      # Folder inside public/images holding this article's gallery images.
+      # Folder inside src/assets/images holding this article's gallery images.
       # Leave blank to use a folder named after the article.
       - name: gallery
         label: Gallery Folder (optional)
@@ -223,7 +229,7 @@ content:
         required: false
 
   # People shown as cards on /people. Filename becomes the card's slug and the
-  # name of its portrait folder: rachel-honnery.md -> public/images/people/
+  # name of its portrait folder: rachel-honnery.md -> src/assets/images/people/
   # rachel-honnery.jpg. The body is the bio — plain prose, no HTML needed.
   - name: people
     label: People
@@ -240,7 +246,7 @@ content:
         type: string
         required: false
 
-      # Leave blank to use public/images/people/<filename>.jpg (or .png/.webp).
+      # Leave blank to use src/assets/images/people/<filename>.jpg (or .png/.webp).
       - name: image
         label: Portrait (upload, or path such as /images/people/jane-doe.png)
         type: image

@@ -4,7 +4,10 @@ import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import Background from '../components/Background.astro';
 import Watermark from '../components/Watermark.astro';
+import type { ImageMetadata } from 'astro';
+import { getImage } from 'astro:assets';
 import { withBase } from '../lib/paths';
+import { photoFor } from '../lib/photos';
 import { defaultShareImage, shareImageUrl } from '../lib/share';
 import { defaultDescription, pageTitle, siteName } from '../lib/site';
 import { SHELL_CONTAINER, SHELL_GRID } from '../lib/shell';
@@ -12,9 +15,9 @@ import { SHELL_CONTAINER, SHELL_GRID } from '../lib/shell';
 interface Props {
   title: string;
   description?: string;
-  /** Hero image for link previews: site-absolute path (`/images/x.jpg`) or full URL.
-      Omit to use the site logo (`defaultShareImage`). */
-  image?: string;
+  /** Hero for link previews: Astro's asset metadata (from `photoFor()`) or a full
+      URL. Omit to use the site logo (`defaultShareImage`). */
+  image?: string | ImageMetadata;
   /** Caption for the preview image (`og:image:alt` / `twitter:image:alt`). */
   imageAlt?: string;
   /** `og:type`: `article` for dated stories, `website` for everything else. */
@@ -36,11 +39,20 @@ const origin = Astro.site ?? Astro.url.origin;
 const canonical = new URL(Astro.url.pathname, origin).href;
 // Preview services fetch the image by absolute URL, so it is resolved against
 // the canonical origin (`site` in astro.config.mjs), not left base-relative.
-const hasImage = !!image;
-const shareImage = shareImageUrl(image ?? defaultShareImage, origin);
+// Preview services fetch the image by absolute URL, and every crawler reads JPEG,
+// so a hero is rendered to one 1200px JPEG rendition at build time (the page's own
+// `<Image>` uses WebP). A full URL written in content is passed through; with no
+// hero at all, the site logo is used.
+const shareSource =
+  typeof image === 'string'
+    ? image
+    : image
+      ? (await getImage({ src: image, width: 1200, format: 'jpeg', quality: 70 })).src
+      : photoFor(defaultShareImage)?.src;
+const shareImage = shareImageUrl(shareSource ?? defaultShareImage, origin);
 // Alt text describes the picture, so it follows whichever one is used: the page's
 // own caption (else its title) for a hero, and the site name for the logo fallback.
-const shareAlt = hasImage ? imageAlt ?? title : siteName;
+const shareAlt = image ? imageAlt ?? title : siteName;
 ---
 
 <!DOCTYPE html>

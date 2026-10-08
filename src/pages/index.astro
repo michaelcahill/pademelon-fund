@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import HomeLayout from '../layouts/HomeLayout.astro';
+import { photoFor, rewritePhotoPaths } from '../lib/photos';
 import { injectSnippets } from '../lib/snippets';
 import { PROSE_CLASS } from '../lib/shell';
 
@@ -15,13 +16,13 @@ if (!home) {
 await render(home);
 
 // `{{snippet-name}}` placeholders become verbatim HTML (src/lib/snippets.ts).
-const bodyHtml = await injectSnippets(home.rendered?.html ?? '');
+const bodyHtml = rewritePhotoPaths(await injectSnippets(home.rendered?.html ?? ''));
 ---
 
 <HomeLayout
   title={home.data.title}
   description={home.data.description}
-  heroImage={home.data.heroImage}
+  heroImage={photoFor(home.data.heroImage)}
   heroAlt={home.data.heroAlt ?? home.data.title}
 >
   <div class={PROSE_CLASS} set:html={bodyHtml} />

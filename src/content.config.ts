@@ -3,8 +3,8 @@ import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 
 /**
- * Fields shared by both collections. Galleries are folders of images inside
- * `public/images/` — see src/lib/galleries.ts.
+ * Fields shared by both collections. Galleries are folders of photos inside
+ * `src/assets/images/` — see src/lib/photos.ts.
  */
 const galleryFields = {
   layout: z
@@ -17,7 +17,7 @@ const galleryFields = {
     .string()
     .optional()
     .describe(
-      'Gallery folder inside public/images. Defaults to the entry slug.',
+      'Gallery folder under src/assets/images. Defaults to the entry slug.',
     ),
   galleryAspect: z
     .string()
@@ -36,7 +36,7 @@ const pages = defineCollection({
   schema: z.object({
     title: z.string(),
     description: z.string().optional(),
-    /** Site-absolute path, e.g. /images/about/team.jpg */
+    /** Photo in src/assets/images, written as a site-absolute path, e.g. /images/about/team.jpg */
     heroImage: z.string().optional(),
     heroAlt: z.string().optional(),
     /**
@@ -57,7 +57,7 @@ const impact = defineCollection({
     title: z.string(),
     pubDate: z.coerce.date(),
     description: z.string(),
-    /** Featured image, shown at the top of the post. */
+    /** Featured photo (src/assets/images, written as `/images/…`), shown at the top of the post. */
     image: z.string().optional(),
     imageAlt: z.string().optional(),
     /**
@@ -97,8 +97,9 @@ const people = defineCollection({
     /** Short line under the name, e.g. "Co-founder". */
     role: z.string().optional(),
     /**
-     * Site-absolute portrait path, e.g. /images/people/rachel-honnery.jpg.
-     * Omit to use `public/images/people/<slug>.<ext>` (any common extension).
+     * Portrait in src/assets/images, written as a site-absolute path, e.g.
+     * /images/people/rachel-honnery.jpg. Omit to use
+     * `src/assets/images/people/<slug>.<ext>` (any common extension).
      */
     image: z.string().optional(),
     imageAlt: z.string().optional(),
@@ -115,7 +116,7 @@ const partners = defineCollection({
   schema: z.object({
     name: z.string(),
     description: z.string().optional(),
-    /** Site-absolute path, e.g. /images/partners/nic.png */
+    /** Logo in src/assets/images, written as a site-absolute path, e.g. /images/partners/nic.png */
     logo: z.string().optional(),
     /** Optional organisation website. */
     link: z.string().optional(),

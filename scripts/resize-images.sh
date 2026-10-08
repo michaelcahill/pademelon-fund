@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Static image scale-down for public/images.
+# Static image scale-down for src/assets/images.
 #
 # Why 1664px: the page shell is capped at max-w-4xl (56rem = 896px) with px-8
 # padding, so a hero image renders at 832 CSS px wide (src/lib/shell.ts). At a
@@ -21,15 +21,15 @@ APPLY=0
 [ "${1:-}" = "--apply" ] && APPLY=1
 
 cd "$(dirname "$0")/.."
-# Backups must live OUTSIDE public/: Astro copies everything under public/ into
-# dist, so a backup folder there ships the originals with the site.
+# Backups live outside src/assets: photos.ts globs every photo under
+# src/assets/images, so a .bak copy in that tree would be treated as a picture.
 BACKUP="scripts/.pre-resize-backup"
 
 # PNGs with real transparency (watermark, nav logo, favicon) are left alone:
 # they are line art and already at or below their display size.
 SKIP=$(printf '%s\n' \
-  "public/images/pademelon-outline.png" \
-  "public/images/pademelon-logo-small.png" \
+  "src/assets/images/pademelon-outline.png" \
+  "src/assets/images/pademelon-logo-small.png" \
   "public/favicon.png")
 
 total_before=0
@@ -41,7 +41,7 @@ while IFS= read -r -d '' f; do
 
   w=$(identify -format "%w" "$f")
   size_before=$(stat -f%z "$f")
-  rel=${f#public/images/}
+  rel=${f#src/assets/images/}
 
   if [ "$w" -le "$TARGET" ]; then
     # Already at hero width: re-encode only, pixels untouched.
@@ -78,7 +78,7 @@ while IFS= read -r -d '' f; do
   fi
   total_before=$((total_before + size_before))
   total_after=$((total_after + after))
-done < <(find public/images -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \) -print0 | sort -z)
+done < <(find src/assets/images -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \) -print0 | sort -z)
 
 echo
 printf 'Total: %s KB -> %s KB (%s%% smaller)\n' \

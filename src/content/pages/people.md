@@ -2,11 +2,11 @@
 title: People
 description: Meet the people of the Pademelon Fund.
 # 'page' (not 'auto'): keeps this text as the main content instead of letting
-# the portrait folder public/images/people/ trigger the gallery layout.
+# the portrait folder src/assets/images/people/ trigger the gallery layout.
 layout: page
 # One card per entry in src/content/people/, placed where the `<!-- cards -->`
 # marker sits below. Each card's photo is found by filename
-# (public/images/people/<slug>.jpg), so a new person is just a new markdown file.
+# (src/assets/images/people/<slug>.jpg), so a new person is just a new markdown file.
 cards: people
 ---
 <!-- cards -->

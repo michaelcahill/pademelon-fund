@@ -2,7 +2,12 @@
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import GalleryLayout from '../../layouts/GalleryLayout.astro';
 import PageLayout from '../../layouts/PageLayout.astro';
-import { galleryFolderFor, getGalleryImages } from '../../lib/galleries';
+import {
+  galleryFolderFor,
+  galleryImages,
+  photoFor,
+  rewritePhotoPaths,
+} from '../../lib/photos';
 import { pickLayout } from '../../lib/layouts';
 import { PROSE_CLASS } from '../../lib/shell';
 import { injectSnippets } from '../../lib/snippets';
@@ -24,11 +29,13 @@ const { post } = Astro.props;
 await render(post);
 
 // `{{snippet-name}}` placeholders become verbatim HTML (src/lib/snippets.ts).
-const bodyHtml = await injectSnippets(post.rendered?.html ?? '');
+// Photos in the body are written as `/images/<file>` (the CMS inserts that shape),
+// so they are pointed at the build-time assets before rendering.
+const bodyHtml = rewritePhotoPaths(await injectSnippets(post.rendered?.html ?? ''));
 
 // A post becomes a gallery when its image folder has images in it.
 const folder = galleryFolderFor(post.data, post.id);
-const images = getGalleryImages(folder, post.data.captions);
+const images = galleryImages(folder, post.data.captions);
 const layout = pickLayout(post.data.layout, images.length);
 ---
 
@@ -43,7 +50,7 @@ const layout = pickLayout(post.data.layout, images.length);
       aspect={post.data.galleryAspect}
       // `image` is optional frontmatter; GalleryLayout falls back to the first
       // tile, which is what a gallery post shows at the top of the page.
-      image={post.data.image}
+      image={photoFor(post.data.image)}
       imageAlt={post.data.imageAlt}
       ogType="article"
       backHref={impactHref}
@@ -56,7 +63,7 @@ const layout = pickLayout(post.data.layout, images.length);
       title={post.data.title}
       description={post.data.description}
       pubDate={post.data.pubDate}
-      heroImage={post.data.image}
+      heroImage={photoFor(post.data.image)}
       heroAlt={post.data.imageAlt ?? post.data.title}
       ogType="article"
       backHref={impactHref}

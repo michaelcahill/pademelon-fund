@@ -20,14 +20,16 @@
  * in global.css (`.pademelon-mark`). Decorative: empty alt + aria-hidden keeps it
  * out of the a11y tree.
  */
-import { withBase } from '../lib/paths';
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+import watermarkPhoto from '../assets/images/pademelon-outline.png';
 
 interface Props {
-  /** Site-absolute path for the drawing (default: the site watermark). */
-  image?: string;
+  /** The drawing to show (default: the site watermark). */
+  image?: ImageMetadata;
 }
 
-const { image = '/images/pademelon-outline.png' } = Astro.props;
+const { image = watermarkPhoto } = Astro.props;
 ---
 
 <!-- Column probe: an empty grid item in column 1. The watermark measures its
@@ -38,11 +40,16 @@ const { image = '/images/pademelon-outline.png' } = Astro.props;
      as the fallback. -->
 <div id="watermark-probe" class="md:col-span-1" aria-hidden="true"></div>
 
-<img
-  src={withBase(image)}
+<!-- The drawing sits at ~261 CSS px in column 1 (see scripts/image-audit.md), so
+     two WebP renditions cover 1× and a Retina screen. -->
+<Image
+  src={image}
   alt=""
   aria-hidden="true"
   data-watermark
+  widths={[261, 522]}
+  format="webp"
+  loading="eager"
   decoding="async"
   class="pademelon-mark pointer-events-none absolute bottom-6 left-0 -z-10 w-24 sm:w-32 md:w-40"
 />

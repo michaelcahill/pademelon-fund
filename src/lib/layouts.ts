@@ -6,7 +6,7 @@ export type LayoutChoice = 'page' | 'home' | 'gallery';
  *
  * `layout: auto` (the default) picks the gallery layout when the entry's image
  * folder contains images, and the plain page layout otherwise. That means a new
- * gallery is created by dropping images into `public/images/<slug>/` — no
+ * gallery is created by dropping images into `src/assets/images/<slug>/` — no
  * frontmatter required. Set `layout: page` or `layout: gallery` to be explicit.
  */
 export function pickLayout(

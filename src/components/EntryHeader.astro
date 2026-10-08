@@ -1,13 +1,15 @@
 ---
-import { withBase } from '../lib/paths';
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+import { HERO_WIDTHS } from '../lib/photos';
 
 interface Props {
   title: string;
   /** Standfirst shown under the title. */
   description?: string;
   pubDate?: Date;
-  /** Site-absolute path (base-relative paths from frontmatter are fixed up). */
-  heroImage?: string;
+  /** Photo resolved by `photoFor()` — Astro builds the srcset at build time. */
+  heroImage?: ImageMetadata;
   heroAlt?: string;
   /** Tailwind width class for the heading/lead text on wide pages. */
   textClass?: string;
@@ -57,12 +59,16 @@ const {
   {description ? <p class="mt-3 text-lg leading-relaxed">{description}</p> : null}
 
   {heroImage ? (
-    <img
-      src={withBase(heroImage)}
+    // `<Image>` writes width/height from the file's metadata and a srcset of WebP
+    // renditions at the widths a hero is shown at (416/832 CSS px, 1× and 2×).
+    <Image
+      src={heroImage}
       alt={heroAlt ?? ''}
-      class="mt-6 aspect-[3/2] w-full rounded-xl object-cover sm:rounded-2xl"
+      widths={HERO_WIDTHS}
+      format="webp"
+      loading="eager"
       decoding="async"
-      fetchpriority="high"
+      class="mt-6 aspect-[3/2] w-full rounded-xl object-cover sm:rounded-2xl"
     />
   ) : null}
 </header>
