@@ -1,18 +1,22 @@
 ---
-// Reactive full-viewport background for the green colour scheme.
-//
-//  - Parallax: the image drifts slower than page scroll (scroll-driven).
-//  - Section-aware: swaps the image when a section scrolls into view. Sections
-//    declare their image via a `data-bg` attribute whose value matches a key
-//    in the `images` map.
-//  - Respects `prefers-reduced-motion`: parallax is disabled when requested.
-//  - Progressive enhancement: with JS disabled the <body> green background
-//    remains and the page is fully usable — no image, no animation.
-//  - No default image: pass `defaultImage` (and optionally `images`) to enable
-//    a background photo. Without one, only the green canvas is shown.
-//
-// Alpine.js (v3, a project dependency) drives the reactivity. Alpine is
-// started and the `background` data component is registered in BaseLayout.astro.
+/**
+ * Reactive full-viewport background for the green colour scheme.
+ *
+ *  - Parallax: the image drifts slower than page scroll (scroll-driven).
+ *  - Section-aware: swaps the image when a section scrolls into view. Sections
+ *    declare their image via a `data-bg` attribute whose value matches a key
+ *    in the `images` map.
+ *  - Respects `prefers-reduced-motion`: parallax is disabled when requested.
+ *  - Progressive enhancement: with JS disabled the <body> green background
+ *    remains and the page is fully usable — no image, no animation.
+ *  - No default image: pass `defaultImage` (and optionally `images`) to enable
+ *    a background photo. Without one, only the green canvas is shown.
+ *
+ * Plain DOM code in the component's own `<script>` (Astro bundles it as a
+ * deferred module): the two jobs here are setting one `background-image` and
+ * writing one CSS variable per scroll frame, which is less work than Alpine's
+ * reactivity layer costs (~20 KB gzip on every page).
+ */
 
 interface Props {
   /** Image shown before any section is in view. Omit for a plain green bg. */
@@ -23,31 +27,79 @@ interface Props {
 
 const { defaultImage, images = {} } = Astro.props;
 
-// Merge the default into the images map so init() has a single source of truth.
-const allImages = { ...images, default: defaultImage };
+// Merge the default into the images map so the script has a single source of truth.
+const allImages = { ...images, default: defaultImage ?? '' };
 ---
 
 <div
-  x-data="background()"
-  x-init="init()"
-  data-bg-images={JSON.stringify(allImages)}
   class="fixed inset-0 -z-10 overflow-hidden"
+  data-bg-root
+  data-bg-images={JSON.stringify(allImages)}
 >
   <!-- Green base layer: the canvas, always visible. -->
   <div class="absolute inset-0 bg-green-bg"></div>
 
-  <!-- Reactive image layer. Hidden (`x-show`) when no image is set, so only the
-       green canvas shows. Alpine sets `background-image` (section swap) via its
-       `current` property, and writes `--bg-y` (parallax) directly in the scroll
-       handler. The `parallax-bg` utility reads `--bg-y` in CSS — compositor-
-       friendly, no JS-driven transforms. -->
+  <!-- Reactive image layer. Hidden while `current` is empty, so only the green
+       canvas shows. The script sets `background-image` (section swap) on this
+       element and writes `--bg-y` (parallax) on the root; the CSS `parallax-bg`
+       utility reads the inherited variable, which keeps updates on the
+       compositor — no layout thrash at 60fps. -->
   <div
     class="absolute inset-0 bg-cover bg-center bg-no-repeat parallax-bg"
-    x-bind:style='`background-image: url(${current});`'
-    x-show="current"
-    x-cloak
+    data-bg-layer
+    style="display:none"
   >
     <!-- Dark green tint keeps foreground content legible over the photo. -->
     <div class="absolute inset-0 bg-emerald-950/60"></div>
   </div>
 </div>
+
+<script>
+  const root = document.querySelector('[data-bg-root]');
+
+  if (root) {
+    const layer = root.querySelector<HTMLElement>('[data-bg-layer]');
+    const images: Record<string, string> = JSON.parse(
+      root.getAttribute('data-bg-images') ?? '{}',
+    );
+    let current = images.default ?? '';
+
+    /** Show `current` (the URL is quoted so spaces/parentheses stay valid). */
+    const paint = () => {
+      if (!layer) return;
+      layer.style.backgroundImage = current ? `url(${JSON.stringify(current)})` : 'none';
+      layer.style.display = current ? '' : 'none';
+    };
+    paint();
+
+    // Parallax: write `--bg-y` directly on each scroll frame. The CSS utility
+    // reads the variable, so scrolling never re-renders a template.
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      let raf: number | null = null;
+      const onScroll = () => {
+        if (raf) cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(() => {
+          root.style.setProperty('--bg-y', `${window.scrollY || 0}px`);
+        });
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+    }
+
+    // Section-aware image swap: when a section with a `data-bg` attribute
+    // scrolls into view, switch the background to match its theme.
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          const key = entry.target.getAttribute('data-bg');
+          if (key && images[key]) {
+            current = images[key];
+            paint();
+          }
+        }
+      },
+      { threshold: 0.4 },
+    );
+    document.querySelectorAll('[data-bg]').forEach((node) => observer.observe(node));
+  }
+</script>

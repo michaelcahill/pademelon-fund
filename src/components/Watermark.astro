@@ -1,0 +1,104 @@
+---
+/**
+ * Pademelon watermark on every page.
+ *
+ * Two states, driven by the script at the bottom of this file:
+ * - floating: `position: fixed`, 1.5rem above the bottom of the window, `left`
+ *   measured from main's left edge so it stays in line with the page shell;
+ * - resting: `position: absolute`, 1.5rem above main's bottom edge — i.e. above
+ *   the footer's rule — which is where it lands once the footer scrolls into view.
+ *
+ * `position: sticky` cannot do this: sticky offsets only *clamp* a box inside its
+ * container, they never pull it toward the viewport, so an image at the top of a
+ * long `main` stays at the top.
+ *
+ * The classes on the image are the no-JS fallback (the resting state): the inline
+ * style outranks them when JS runs. `-z-10` puts the image behind content: `main`
+ * is `relative` with z-index auto, so it is not a stacking context and the
+ * negative index resolves against the root — above the fixed <Background /> layer
+ * (same index, later in tree order) and below normal page content. Opacity lives
+ * in global.css (`.pademelon-mark`). Decorative: empty alt + aria-hidden keeps it
+ * out of the a11y tree.
+ */
+import { withBase } from '../lib/paths';
+
+interface Props {
+  /** Site-absolute path for the drawing (default: the site watermark). */
+  image?: string;
+}
+
+const { image = '/images/pademelon-outline.png' } = Astro.props;
+---
+
+<!-- Column probe: an empty grid item in column 1. The watermark measures its
+     width so the drawing scales to the left column that the text columns leave
+     free. It is zero-height, so it cannot shift content. Below `md` the grid is
+     inert and the probe reports main's full content width — far too big for a
+     phone — which `measure` ignores, leaving the responsive class widths below
+     as the fallback. -->
+<div id="watermark-probe" class="md:col-span-1" aria-hidden="true"></div>
+
+<img
+  src={withBase(image)}
+  alt=""
+  aria-hidden="true"
+  data-watermark
+  decoding="async"
+  class="pademelon-mark pointer-events-none absolute bottom-6 left-0 -z-10 w-24 sm:w-32 md:w-40"
+/>
+
+<script>
+  const img = document.querySelector<HTMLElement>('[data-watermark]');
+  const main = document.getElementById('main');
+  const footer = document.querySelector('.site-footer');
+  const probe = document.getElementById('watermark-probe');
+
+  if (img && main && footer && probe) {
+    let resting = false;
+    /** Left offset inside main's padding box, so resting and floating put the
+       drawing at the same x (column 1 starts after `px-4/6/8`). */
+    let padLeft = 0;
+    let left = 0;
+    /** Column width in px; null falls back to the responsive class widths. */
+    let width: number | null = null;
+
+    const paint = () => {
+      const size = width === null ? '' : `width:${width}px;`;
+      img.style.cssText = resting
+        ? `position:absolute;left:${padLeft}px;bottom:1.5rem;${size}`
+        : `position:fixed;left:${left}px;bottom:1.5rem;${size}`;
+    };
+
+    // Fixed positioning is viewport-relative, so the page shell's left edge has
+    // to be measured — that keeps the image in line with the box. On wide
+    // screens the drawing fills column 1, read from the live grid (measuring
+    // beats duplicating Tailwind's column maths in JS).
+    const measure = () => {
+      if (getComputedStyle(main).display === 'grid') {
+        const box = main.getBoundingClientRect();
+        const column = probe.getBoundingClientRect();
+        left = Math.round(column.left);
+        width = Math.round(column.width);
+        padLeft = Math.round(column.left - box.left);
+      } else {
+        left = Math.round(main.getBoundingClientRect().left);
+        width = null;
+        padLeft = 0;
+      }
+      paint();
+    };
+
+    measure();
+    window.addEventListener('resize', measure);
+
+    // IntersectionObserver fires on entry and exit, so scrolling back down
+    // releases the image to the window bottom again.
+    new IntersectionObserver(
+      (entries) => {
+        resting = entries[0]?.isIntersecting ?? false;
+        paint();
+      },
+      { threshold: 0 },
+    ).observe(footer);
+  }
+</script>
