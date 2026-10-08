@@ -6,6 +6,7 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import { satteri } from '@astrojs/markdown-satteri';
 import tailwindcss from '@tailwindcss/vite';
+import { DOCUMENT_EXT, isDocumentPath } from './src/lib/documents';
 
 // Base path. Served from a custom domain at the root, so this stays empty.
 // Set it (e.g. '/pademelon-fund') only if the site ever moves under a
@@ -22,8 +23,6 @@ const site = process.env.SITE_URL ?? 'https://pademelon.fund';
 const DOCUMENTS_ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), 'public', 'documents');
 const DOCUMENTS_URL = '/documents';
 
-/** Any file accepted by the Documents upload source. */
-const DOCUMENT_EXT = /\.(pdf|docx?|xlsx?|csv|pptx?|odt|ods|rtf|txt|zip|gz|epub|ics)$/i;
 
 /**
  * Resolves a path written in content to a real file inside `public/documents`,
@@ -97,6 +96,31 @@ function prefixContentPaths() {
 }
 
 /**
+ * Mark links to uploaded files so Astro's prefetcher leaves them alone.
+ *
+ * `prefetch` below watches every internal link, and Astro does not filter by
+ * file type: hovering a "Read the report" card would pull a multi-megabyte PDF
+ * across the wire. `data-astro-prefetch="false"` opts a link out, which is what
+ * this plugin writes on any anchor whose target is an upload. Content-authored
+ * links get it here; site-authored ones (the impact cards) set the attribute in
+ * their component, using `isDocumentPath`.
+ */
+function skipUploadPrefetch() {
+  return {
+    name: 'skip-upload-prefetch',
+    element: {
+      filter: ['a'],
+      visit(node, ctx) {
+        const href = node.properties?.href;
+        if (typeof href === 'string' && isDocumentPath(href)) {
+          ctx.setProperty(node, 'data-astro-prefetch', 'false');
+        }
+      },
+    },
+  };
+}
+
+/**
  * @astrojs/sitemap always writes an index file (`sitemap-index.xml`) pointing
  * at one chunk per 45 000 URLs (`sitemap-0.xml`). This site is nowhere near
  * that limit, and tools such as GitCMS look for a plain `/sitemap.xml`, so the
@@ -126,6 +150,10 @@ function plainSitemapFile() {
 export default defineConfig({
   base,
   site,
+  // Hover-prefetch every internal link: pages are 1–40 KB of HTML, so a link
+  // that is hovered is already in the browser cache when it is tapped. Uploads
+  // are opted out by the skipUploadPrefetch plugin and by the impact cards.
+  prefetch: { prefetchAll: true, defaultStrategy: 'hover' },
   integrations: [
     // `/founders` is a redirect stub for the renamed People page — keep it out
     // of the sitemap so only /people is advertised.
@@ -147,7 +175,7 @@ export default defineConfig({
       // prefixContentPaths plugin can visit <img> and <a> tags regardless of
       // whether they are written as markdown syntax or as raw HTML.
       features: { rawHtml: true },
-      hastPlugins: [prefixContentPaths()],
+      hastPlugins: [prefixContentPaths(), skipUploadPrefetch()],
     }),
   },
 });

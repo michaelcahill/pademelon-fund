@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { countGalleryImages, galleryFolderFor } from '../../lib/galleries';
+import { isDocumentPath } from '../../lib/documents';
 import { withBase } from '../../lib/paths';
 import { FULL_WIDTH } from '../../lib/shell';
 
@@ -48,6 +49,12 @@ const description =
           const externalAttrs = isExternal
             ? { target: '_blank', rel: 'noopener noreferrer' }
             : {};
+          // Astro's prefetcher watches every internal link and does not filter by
+          // file type, so a card pointing at a PDF opts out with this attribute
+          // (the same one the skipUploadPrefetch plugin writes in astro.config.mjs).
+          const prefetchAttrs = isDocumentPath(href)
+            ? { 'data-astro-prefetch': 'false' }
+            : {};
 
           return (
             <li class="card flex flex-col">
@@ -55,7 +62,7 @@ const description =
                    when set, otherwise the story page. Same href as the title below;
                    the CTA at the end of the card always goes to the story. -->
               {post.data.image ? (
-                <a href={href} {...externalAttrs} class="block">
+                <a href={href} {...externalAttrs} {...prefetchAttrs} class="block">
                   <img
                     src={withBase(post.data.image)}
                     alt={post.data.imageAlt ?? ''}
@@ -75,7 +82,7 @@ const description =
                 </time>
 
                 <h2 class="mt-2 text-lg font-bold leading-snug">
-                  <a href={href} {...externalAttrs}>
+                  <a href={href} {...externalAttrs} {...prefetchAttrs}>
                     {post.data.title}
                   </a>
                 </h2>
