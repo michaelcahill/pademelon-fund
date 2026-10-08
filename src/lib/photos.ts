@@ -1,4 +1,5 @@
 import type { ImageMetadata } from 'astro';
+import { getImage } from 'astro:assets';
 import { basePath } from './paths';
 
 /**
@@ -185,14 +186,63 @@ export function portraitFor(data: { image?: string }, slug: string): ImageMetada
  * a photo we know about; anything not found (an external URL, an unknown file) is left
  * exactly as written.
  */
-export function rewritePhotoPaths(html: string): string {
-  return html.replace(
-    /(src|href)="([^"]+)"/g,
-    (match, attr: string, value: string) => {
-      const meta = photoFor(value);
-      return meta ? `${attr}="${meta.src}"` : match;
-    },
+export async function rewritePhotoPaths(html: string): Promise<string> {
+  // Resolve every referenced photo once; a name with no asset (an external URL, an
+  // unknown file) is left exactly as written.
+  const refs = [...new Set([...html.matchAll(/(?:src|href)="([^"]+)"/g)].map((m) => m[1]))]
+    .filter((ref) => photoFor(ref));
+  if (!refs.length) return html;
+
+  const resolved = new Map<string, { best: string; srcset: string; full: string; width: number; height: number }>();
+  await Promise.all(
+    refs.map(async (ref) => {
+      const meta = photoFor(ref)!;
+      // Cap at the source width: asking for more would enlarge the photo.
+      const widths = BODY_WIDTHS.map((w) => Math.min(w, meta.width));
+      const renditions = await Promise.all(widths.map((w) => getImage({ src: meta, width: w, format: 'webp' })));
+      resolved.set(ref, {
+        best: renditions[renditions.length - 1].src,
+        // `getImage` reports the requested width in `rawOptions`, so pair the rendition
+        // with the width it was asked for.
+        srcset: renditions
+          .map((r, i) => `${r.src} ${r.rawOptions.width ?? widths[i]}w`)
+          .join(', '),
+        // A link to a photo opens the whole picture, so it points at the source size.
+        full: (await getImage({ src: meta, width: meta.width, format: 'webp' })).src,
+        width: meta.width,
+        height: meta.height,
+      });
+    }),
   );
+
+  const out = html.replace(/href="([^"]+)"/g, (match, ref: string) => {
+    const r = resolved.get(ref);
+    return r ? `href="${r.full}"` : match;
+  });
+
+  return out.replace(/<img\b[^>]*>/g, (tag) => {
+    const src = tag.match(/\bsrc="([^"]+)"/)?.[1];
+    const r = src && resolved.get(src);
+    if (!r) return tag;
+
+    // What content wrote is kept (alt, class, an explicit loading choice); Astro adds
+    // the srcset and the intrinsic size, which reserves the space so a body photo
+    // cannot shift the text below it while it loads.
+    const attrs = [
+      `src="${r.best}"`,
+      `srcset="${r.srcset}"`,
+      `width="${r.width}"`,
+      `height="${r.height}"`,
+    ];
+    for (const [, name, value] of tag.matchAll(/\b([a-zA-Z-]+)="([^"]*)"/g)) {
+      if (name !== 'src' && !attrs.some((a) => a.startsWith(`${name}=`))) {
+        attrs.push(`${name}="${value}"`);
+      }
+    }
+    if (!attrs.some((a) => a.startsWith('loading='))) attrs.push('loading="lazy"');
+    if (!attrs.some((a) => a.startsWith('decoding='))) attrs.push('decoding="async"');
+    return `<img ${attrs.join(' ')}>`;
+  });
 }
 
 /** Widths a photo is displayed at (see scripts/image-audit.md): hero 832 CSS px,
@@ -200,3 +250,7 @@ export function rewritePhotoPaths(html: string): string {
 export const HERO_WIDTHS = [416, 832];
 export const TILE_WIDTHS = [267, 534];
 export const CARD_WIDTHS = [404, 808];
+
+/** Body photos sit in `TEXT_COLUMN`: the container is 832 CSS px, three columns with
+ * `gap-x-6` make each 261, so two columns plus the gap is ~547 CSS px — 1× and 2×. */
+export const BODY_WIDTHS = [547, 1094];

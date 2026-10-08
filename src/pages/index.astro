@@ -16,7 +16,7 @@ if (!home) {
 await render(home);
 
 // `{{snippet-name}}` placeholders become verbatim HTML (src/lib/snippets.ts).
-const bodyHtml = rewritePhotoPaths(await injectSnippets(home.rendered?.html ?? ''));
+const bodyHtml = await rewritePhotoPaths(await injectSnippets(home.rendered?.html ?? ''));
 ---
 
 <HomeLayout

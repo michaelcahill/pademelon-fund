@@ -31,7 +31,7 @@ await render(post);
 // `{{snippet-name}}` placeholders become verbatim HTML (src/lib/snippets.ts).
 // Photos in the body are written as `/images/<file>` (the CMS inserts that shape),
 // so they are pointed at the build-time assets before rendering.
-const bodyHtml = rewritePhotoPaths(await injectSnippets(post.rendered?.html ?? ''));
+const bodyHtml = await rewritePhotoPaths(await injectSnippets(post.rendered?.html ?? ''));
 
 // A post becomes a gallery when its image folder has images in it.
 const folder = galleryFolderFor(post.data, post.id);

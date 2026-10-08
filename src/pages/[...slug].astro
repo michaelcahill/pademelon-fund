@@ -41,7 +41,7 @@ await render(page);
 // which is exactly what <Content /> would have output, placeholders resolved.
 // Photos in the body are written as `/images/<file>` (the CMS inserts that shape),
 // so they are pointed at the build-time assets before rendering.
-const bodyHtml = rewritePhotoPaths(await injectSnippets(page.rendered?.html ?? ''));
+const bodyHtml = await rewritePhotoPaths(await injectSnippets(page.rendered?.html ?? ''));
 
 // A page becomes a gallery when its image folder has images in it.
 const folder = galleryFolderFor(page.data, page.id);
