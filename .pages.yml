@@ -23,7 +23,7 @@ media:
     # Under src/, so Astro optimises them; the value written into content stays
     # `/images/<file>` and src/lib/photos.ts resolves it to the built asset.
     input: src/assets/images
-    output: /images
+    output: ../assets/images
     categories: [image]
 
   - name: documents
