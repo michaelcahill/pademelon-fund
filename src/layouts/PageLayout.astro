@@ -15,6 +15,8 @@ interface Props {
   /** Site-absolute path, e.g. `/images/about/team.jpg` (frontmatter style). */
   heroImage?: string;
   heroAlt?: string;
+  /** `og:type` — `article` for dated stories, `website` for pages. */
+  ogType?: 'website' | 'article';
   /** Renders a "back" link after the article body. */
   backHref?: string;
   backLabel?: string;
@@ -26,12 +28,20 @@ const {
   pubDate,
   heroImage,
   heroAlt,
+  ogType,
   backHref,
   backLabel = 'Back',
 } = Astro.props;
 ---
 
-<BaseLayout title={title} description={description}>
+<BaseLayout
+  title={title}
+  description={description}
+  image={heroImage}
+  imageAlt={heroAlt}
+  ogType={ogType}
+  pubDate={pubDate}
+>
   <!-- Title, standfirst and hero span the whole shell; only the body text is
        pulled into the right two columns (see src/lib/shell.ts). -->
   <article class:list={[FULL_GRID]}>

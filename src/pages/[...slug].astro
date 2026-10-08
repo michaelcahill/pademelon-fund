@@ -56,6 +56,10 @@ const split = cards ? splitAtCards(bodyHtml) : undefined;
       images={images}
       group={folder}
       aspect={page.data.galleryAspect}
+      // A page can name its own preview image; without one GalleryLayout uses
+      // the first tile of the folder (and its caption).
+      image={page.data.heroImage}
+      imageAlt={page.data.heroAlt}
     >
       <div slot="intro" class={PROSE_CLASS} set:html={bodyHtml} />
     </GalleryLayout>

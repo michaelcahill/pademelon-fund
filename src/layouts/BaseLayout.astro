@@ -4,20 +4,42 @@ import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import Background from '../components/Background.astro';
 import { withBase } from '../lib/paths';
+import { defaultShareImage, shareImageUrl } from '../lib/share';
 import { defaultDescription, pageTitle, siteName } from '../lib/site';
 import { SHELL_CONTAINER, SHELL_GRID } from '../lib/shell';
 
 interface Props {
   title: string;
   description?: string;
+  /** Hero image for link previews: site-absolute path (`/images/x.jpg`) or full URL.
+      Omit to use the site logo (`defaultShareImage`). */
+  image?: string;
+  /** Caption for the preview image (`og:image:alt` / `twitter:image:alt`). */
+  imageAlt?: string;
+  /** `og:type`: `article` for dated stories, `website` for everything else. */
+  ogType?: 'website' | 'article';
+  /** Publication date, written as `article:published_time` for impact posts. */
+  pubDate?: Date;
 }
 
 const {
   title,
   description = defaultDescription,
+  image,
+  imageAlt,
+  ogType = 'website',
+  pubDate,
 } = Astro.props;
 const fullTitle = pageTitle(title);
-const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin).href;
+const origin = Astro.site ?? Astro.url.origin;
+const canonical = new URL(Astro.url.pathname, origin).href;
+// Preview services fetch the image by absolute URL, so it is resolved against
+// the canonical origin (`site` in astro.config.mjs), not left base-relative.
+const hasImage = !!image;
+const shareImage = shareImageUrl(image ?? defaultShareImage, origin);
+// Alt text describes the picture, so it follows whichever one is used: the page's
+// own caption (else its title) for a hero, and the site name for the logo fallback.
+const shareAlt = hasImage ? imageAlt ?? title : siteName;
 ---
 
 <!DOCTYPE html>
@@ -34,11 +56,28 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin).hr
     <meta name="color-scheme" content="light" />
     <meta name="theme-color" content="#3d4746" />
 
-    <meta property="og:type" content="website" />
+    <!-- Link previews. Facebook/WhatsApp/Messenger/iMessage/Slack/LinkedIn read
+         the `og:*` block; X (twitter:) ignores it and reads its own keys, so the
+         card is written twice from the same values. The image is the page's hero,
+         falling back to the site logo (`defaultShareImage`). -->
+    <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content={siteName} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={shareImage} />
+    {shareAlt ? <meta property="og:image:alt" content={shareAlt} /> : null}
+    {pubDate ? (
+      <meta property="article:published_time" content={pubDate.toISOString()} />
+    ) : null}
+
+    <!-- `summary_large_image` is the wide card; the site's heroes are landscape,
+         so it matches. X wants an image under 1 MB (see scripts/image-audit.md). -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={shareImage} />
+    {shareAlt ? <meta name="twitter:image:alt" content={shareAlt} /> : null}
 
     <link rel="canonical" href={canonical} />
     <link rel="icon" type="image/png" href={withBase('/favicon.png')} />

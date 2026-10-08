@@ -22,7 +22,12 @@ interface Props {
 const { title, description, heroImage, heroAlt, ctas = [] } = Astro.props;
 ---
 
-<BaseLayout title={title} description={description}>
+<BaseLayout
+    title={title}
+    description={description}
+    image={heroImage}
+    imageAlt={heroAlt}
+>
     <!-- The hero spans the full shell; page sections read in the right two
          columns (see src/lib/shell.ts). -->
     <div class:list={["overflow-hidden", FULL_GRID]}>

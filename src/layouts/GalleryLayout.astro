@@ -16,6 +16,11 @@ interface Props {
   /** CSS aspect-ratio per tile; match the source photos (default `3/2`). */
   aspect?: string;
   showCaptions?: boolean;
+  /** Preview image; defaults to the first tile when no hero is given. */
+  image?: string;
+  imageAlt?: string;
+  /** `og:type` — `article` for dated stories, `website` for pages. */
+  ogType?: 'website' | 'article';
   backHref?: string;
   backLabel?: string;
 }
@@ -28,12 +33,27 @@ const {
   group,
   aspect = '3/2',
   showCaptions = false,
+  image,
+  imageAlt,
+  ogType,
   backHref,
   backLabel = 'Back',
 } = Astro.props;
+
+// A gallery has no hero of its own, so the first tile (filename order) stands in
+// as the preview image; `src` is base-prefixed and `alt` is the caption.
+const shareImage = image ?? images[0]?.src;
+const shareAlt = imageAlt ?? images[0]?.alt;
 ---
 
-<BaseLayout title={title} description={description}>
+<BaseLayout
+  title={title}
+  description={description}
+  image={shareImage}
+  imageAlt={shareAlt}
+  ogType={ogType}
+  pubDate={pubDate}
+>
   <!-- Title, standfirst and the tile grid span the whole shell; prose reads in
        the right two columns (see src/lib/shell.ts). -->
   <article class:list={[FULL_GRID]}>

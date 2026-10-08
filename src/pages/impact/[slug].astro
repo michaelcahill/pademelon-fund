@@ -41,6 +41,11 @@ const layout = pickLayout(post.data.layout, images.length);
       images={images}
       group={folder}
       aspect={post.data.galleryAspect}
+      // `image` is optional frontmatter; GalleryLayout falls back to the first
+      // tile, which is what a gallery post shows at the top of the page.
+      image={post.data.image}
+      imageAlt={post.data.imageAlt}
+      ogType="article"
       backHref={impactHref}
       backLabel="Back to all impact stories"
     >
@@ -53,6 +58,7 @@ const layout = pickLayout(post.data.layout, images.length);
       pubDate={post.data.pubDate}
       heroImage={post.data.image}
       heroAlt={post.data.imageAlt ?? post.data.title}
+      ogType="article"
       backHref={impactHref}
       backLabel="Back to all impact stories"
     >
