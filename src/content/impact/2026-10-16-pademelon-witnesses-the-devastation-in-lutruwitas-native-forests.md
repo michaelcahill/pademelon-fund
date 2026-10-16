@@ -1,5 +1,5 @@
 ---
-title: Pademelon witnesses the devastation in Lutruwita's native forests
+title: Witnessing the Devastation of Lutruwita's Native Forests
 pubDate: 2026-10-10
 description: A reflection on an EJA-led tour of native forest clearfelling sites
   in Lutruwita/Tasmania
